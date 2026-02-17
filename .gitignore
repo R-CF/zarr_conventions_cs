@@ -10,3 +10,8 @@ Thumbs.db
 .npm
 /node_modules/
 package-lock.json
+
+# R
+.Rproj.user
+zarr_conventions_cs.Rproj
+README.html

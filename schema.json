@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Template Convention",
-  "description": "Schema for Template Zarr convention, supporting both key-prefixed and nested namespace patterns",
+  "title": "Coordinate System Convention",
+  "description": "Schema for the coordinate system convention",
   "type": "object",
   "properties": {
     "zarr_format": {
@@ -23,17 +23,12 @@
           "contains": {
             "$ref": "#/$defs/conventionMetadata"
           }
+        },
+        "cs": {
+          "$ref": "#/$defs/cs"
         }
       },
-      "required": ["zarr_conventions"],
-      "oneOf": [
-        {
-          "$ref": "#/$defs/keyPrefixedAttributes"
-        },
-        {
-          "$ref": "#/$defs/nestedAttributes"
-        }
-      ]
+      "required": ["zarr_conventions", "cs"]
     }
   },
   "required": ["zarr_format", "node_type", "attributes"],
@@ -41,31 +36,31 @@
   "$defs": {
     "conventionMetadata": {
       "type": "object",
-      "description": "Template convention metadata object for use in zarr_conventions array",
+      "description": "Convention metadata object for use in zarr_conventions array",
       "properties": {
         "schema_url": {
           "type": "string",
-          "const": "https://raw.githubusercontent.com/zarr-conventions/template/refs/tags/v1/schema.json",
+          "const": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/tags/v1/schema.json",
           "description": "URL to the JSON Schema definition for this convention"
         },
         "spec_url": {
           "type": "string",
-          "const": "https://github.com/zarr-conventions/template/blob/v1/README.md",
+          "const": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/tags/v1/README.md",
           "description": "URL to the full specification document"
         },
         "uuid": {
           "type": "string",
-          "const": "00000000-0000-0000-0000-000000000000",
+          "const": "e4dbf0b7-7a00-4ce6-b23e-484292014ab4",
           "description": "UUID that permanently identifies this convention"
         },
         "name": {
           "type": "string",
-          "description": "Human-readable name of the convention. Should be 'template:' for key-prefixed pattern or 'template' for nested pattern"
+          "description": "cs"
         },
         "description": {
           "type": "string",
-          "const": "Template convention for demonstrating Zarr convention metadata structure",
-          "description": "Brief description of the convention's purpose and usage"
+          "const": "Coordinate system convention for Zarr arrays",
+          "description": "Convention to assign semantic meaning to the dimensions of Zarr arrays, using axes and coordinates"
         }
       },
       "anyOf": [
@@ -81,81 +76,116 @@
       ],
       "additionalProperties": false
     },
-    "conventionProperties": {
+    "cs": {
       "type": "object",
-      "description": "Template convention properties",
+      "description": "Coordinate system convention properties",
       "properties": {
-        "new_field": {
+        "name": {
           "type": "string",
-          "description": "REQUIRED. Describe the required field..."
+          "description": "Descriptive name for the coordinate system. Optional for arrays, required for groups."
         },
-        "xyz": {
-          "$ref": "#/$defs/xyzObject"
-        },
-        "another_one": {
+        "composite": {
           "type": "array",
-          "description": "Array of numeric values",
           "items": {
-            "type": "number"
+            "$ref": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/tags/v1/schema.json#/$defs/ref"
+          }
+        },
+        "axes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/axis"
           }
         }
       },
-      "required": ["new_field"],
-      "additionalProperties": false
-    },
-    "xyzObject": {
-      "type": "object",
-      "description": "XYZ Object containing x, y, z coordinates",
-      "properties": {
-        "x": {
-          "type": "number",
-          "description": "REQUIRED. X coordinate value"
-        },
-        "y": {
-          "type": "number",
-          "description": "REQUIRED. Y coordinate value"
-        },
-        "z": {
-          "type": "number",
-          "description": "REQUIRED. Z coordinate value"
-        }
-      },
-      "required": ["x", "y", "z"],
-      "additionalProperties": false
-    },
-    "keyPrefixedAttributes": {
-      "type": "object",
-      "description": "Template convention using key-prefixed pattern (e.g., template:new_field)",
-      "properties": {
-        "zarr_conventions": true,
-        "template:new_field": {
-          "type": "string",
-          "description": "REQUIRED. Describe the required field..."
-        },
-        "template:xyz": {
-          "$ref": "#/$defs/xyzObject"
-        },
-        "template:another_one": {
-          "type": "array",
-          "description": "Array of numeric values",
-          "items": {
-            "type": "number"
-          }
-        }
-      },
-      "required": ["template:new_field"],
+      "anyOf": [
+        { "required": ["composite"] },
+        { "required": ["axes"] }
+      ],
       "additionalProperties": true
     },
-    "nestedAttributes": {
+    "axis": {
       "type": "object",
-      "description": "Template convention using nested pattern (single 'template' key)",
+      "description": "Properties of an individual axis",
       "properties": {
-        "zarr_conventions": true,
-        "template": {
-          "$ref": "#/$defs/conventionProperties"
+        "name": {
+          "type": "string",
+          "description": "Required. Name of the axis."
+        },
+        "abbreviation": {
+          "type": "string",
+          "description": "Required. Abbreviation of the axis, such as \"X\" or \"Y\"."
+        },
+        "direction": {
+          "type": "string",
+          "description": "The direction of increasing coordinate values. Its value must be taken from Table 48 of OGC standard \"Referencing by Coordinates\"."
+        },
+        "unit": {
+          "$ref": "https://raw.githubusercontent.com/clbarnes/zarr-convention-uom/refs/tags/v1/schema.json#/$defs/uom"
+        },
+        "time": {
+          "type": "string"
+        },
+        "values": {
+          "$ref": "#/$defs/values"
+        },
+        "boundaries": {
+          "$ref": "#/$defs/bounds"
         }
       },
-      "required": ["template"],
+      "required": ["name", "abbreviation", "values"],
+      "additionalProperties": true
+    },
+    "values": {
+      "type": "object",
+      "description": "The coordinate values of an axis",
+      "properties": {
+        "regular": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Initial coordinate value (at shape index 0) and increment between successive coordinates.",
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "external": {
+          "$ref": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/tags/v1/schema.json#/$defs/ref",
+          "description": "Path to a 1-dimensional array with coordinate values."
+        },
+        "explicit": {
+          "type": "array",
+          "description": "JSON array of coordinate values."
+        }
+      },
+      "oneOf": [
+        { "required": ["regular"] },
+        { "required": ["external"] },
+        { "required": ["explicit"] }
+      ],
+      "additionalProperties": true
+    },
+    "boundaries": {
+      "type": "object",
+      "description": "The boundary values around coordinate values of an axis",
+      "properties": {
+        "regular": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "JSON array with the extent below and above the coordinate value.",
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "external": {
+          "$ref": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/tags/v1/schema.json#/$defs/ref",
+          "description": "Path to an array providing boundary values."
+        }
+      },
+      "oneOf": [
+        { "required": ["regular"] },
+        { "required": ["external"] }
+      ],
       "additionalProperties": true
     }
   }
