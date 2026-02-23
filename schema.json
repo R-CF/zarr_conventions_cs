@@ -13,6 +13,12 @@
       "enum": ["array", "group"],
       "description": "Type of Zarr node"
     },
+    "shape": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
     "attributes": {
       "type": "object",
       "description": "Zarr attributes containing convention metadata and properties",
@@ -113,7 +119,7 @@
         },
         "abbreviation": {
           "type": "string",
-          "description": "Required. Abbreviation of the axis, such as \"X\" or \"Y\"."
+          "description": "Abbreviation of the axis, such as \"X\" or \"Y\"."
         },
         "direction": {
           "type": "string",
@@ -132,7 +138,7 @@
           "$ref": "#/$defs/bounds"
         }
       },
-      "required": ["name", "abbreviation", "values"],
+      "required": ["name", "values"],
       "additionalProperties": true
     },
     "values": {
