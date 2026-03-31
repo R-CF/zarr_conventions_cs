@@ -15,3 +15,4 @@ package-lock.json
 .Rproj.user
 zarr_conventions_cs.Rproj
 README.html
+.Rhistory

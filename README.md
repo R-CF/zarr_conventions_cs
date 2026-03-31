@@ -16,13 +16,13 @@ Zarr arrays have a mandatory `shape` attribute with an element for each dimensio
 
 In addition to defining axes and coordinate values, this convention defines auxiliary axis properties such as boundary values. This convention also allows for the construction of single-valued axes not represented in the array.
 
-This convention follows the guidance from OGC standard [Referencing by Coordinates](http://www.opengis.net/doc/AS/topic-2/5.0.1) related to coordinate system and axis definitions, but applied to the Zarr specification and extended to dimensions beyond the spatio-temporal domain. Constructs are based on the [CF Metadata Conventions](https://cfconventions.org/cf-conventions/cf-conventions.html) for coordinate types and coordinate systems and their associated objects.
+This convention follows the guidance from OGC standard [Referencing by Coordinates](http://www.opengis.net/doc/AS/topic-2/5.0.1) related to coordinate system and axis definitions, but applied to the Zarr specification and extended to dimensions beyond the spatio-temporal domain. Concepts for this convention are based on the [CF Metadata Conventions](https://cfconventions.org/cf-conventions/cf-conventions.html) for coordinate types and coordinate systems and their associated objects.
 
 Coordinate systems may be shared by multiple arrays in a single Zarr store. This is achieved by placing the `cs` properties in a group and referencing that group and the `cs` attribute from each array.
 
-Coordinate systems may also be composed from multiple other coordinate systems that each cover a sub-domain of the main coordinate system. As an example, a coordinate system may be defined for the planar X-Y coordinates and another one for a vertical atmospheric profile. An array with surface temperature will reference just the X-Y coordinate system, while another array in the same store using the same X-Y coordinates can composite both coordinate systems to describe vertical temperature profiles. A temporal coordinate system may be added to store time series for either array. Note that this arrangements mimics the composition of CRS's in the OGC standard.
+Coordinate systems may also be composed from multiple other coordinate systems that each cover a sub-domain of the array's coordinate system. As an example, a coordinate system may be defined for the planar X-Y coordinates and another one for a vertical atmospheric profile. An array with surface temperature will reference just the X-Y coordinate system, while another array in the same store using the same X-Y coordinates can composite both coordinate systems to describe vertical temperature profiles. A temporal coordinate system may be added to store time series for either array. Note that this arrangements mimics the composition of CRS's in the OGC standard.
 
-This convention does not include other CRS constructs as these are provided by the [`proj:` convention](https://github.com/zarr-conventions/geo-proj). See the Examples section on how these two conventions can be combined.
+This convention does not include CRS constructs other than the coordinate system as these are provided by the [`proj:` convention](https://github.com/zarr-conventions/geo-proj). See the Examples section on how these two conventions can be combined.
 
 ## Motivation
 
@@ -59,17 +59,17 @@ This convention can be used with these parts of the Zarr hierarchy:
 - [x] Array
 
 ## Properties
-The `cs` property is placed at the root `attributes` level of a group or array. In an array it is always a single object, in a group it may be a single `cs` object or an array thereof. It has the following fields:
+The `cs` property is placed at the root `attributes` level of a group or array. In an array it is a single object, in a group it is an array of `cs` objects. It has the following fields:
 
 | Field Name | Type                        | Description                    | Required    |
 | ---------- | --------------------------- | ------------------------------ | ----------- |
 | name       | string                      | Name of the coordinate system. | Conditional |
 | composite  | [ref] | Array of references to coordinate systems that this coordinate system is composed of. | Conditional |
-| axes       | [Axis object](#axis-object) | Array of axis properties.      | Conditional |
+| axes       | [[Axis object](#axis-object)] | Array of axis properties.      | Conditional |
 
 At least one of `composite` and `axes` MUST be provided.
 
-Irrespective of the order in which coordinate systems and axes are defined, the composite set of axes resulting from combining the `composite` and `axes` fields MUST be interpreted in the order in which the axis names appear in the `dimension_names` attribute of the array to which the composited coordinate system is applied for addressing elements in the array.
+Irrespective of the order in which coordinate systems and axes are defined, the composite set of axes resulting from combining the `composite` and `axes` fields MUST be interpreted in the order in which the axis names appear in the `dimension_names` attribute of the array to which the composited coordinate system is applied for addressing elements in the array. Axes of length 1 that are not reflected in the array dimensions may be managed in an application-specific manner.
 
 #### name
 The `name` attribute is a descriptive name of the coordinate system by which it may be referenced by other objects in the Zarr store. The name MUST follow standard Zarr requirements for object names.
@@ -89,17 +89,14 @@ The axis object defines all the properties of an individual axis.
 | name         | string   | Name of the axis.              | Yes         |
 | abbreviation | string   | Abbreviation of the axis name. | Conditional |
 | direction    | string   | Direction of the axis.         | Conditional |
-| unit         | uom      | Unit-of-measure of the axis coordinates. | Conditional |
-| time         | [Time object](#time-object) | Time definition for a temporal axis. | Conditional |
-| values       | [Values object](#values-object) | The values of the coordinates. | Yes        |
-| boundaries   | [Boundaries object](#boundaries-object) | Boundary values of the coordinates. | Conditional |
+| coordinates  | [[Coordinates object](#coordinates-object)] | Array of coordinates for the axis. | Conditional |
 | attributes   | {} | Any other attributes of the axis. | No |
 
 #### name
-A short name that describes this axis. The name MUST be present in the `dimension_names` attribute of the array, unless the axis is single-valued. The name MAY NOT be used by any other axis in the coordinate system, including over composited coordinate systems.
+A short name that describes this axis. The name MUST be present in the `dimension_names` attribute of the array, unless the axis is single-valued. The name MAY NOT be used by any other axis in the coordinate system, including across composited coordinate systems.
 
 #### abbreviation
-The abbreviation of the axis. It MUST be provided for axes that are in the spatio-temporal domain, using the string values `"X"`, `"Y"`, `"Z"` and `"T"`, as appropriate. It MUST be omitted otherwise.
+The abbreviation of the axis. It MUST be provided for axes that are in the spatio-temporal domain, using one of the values `"X"`, `"Y"`, `"Z"` or `"T"`, as appropriate. There may be only one occurrence of any of the abbreviations in the coordinate system, including across composited coordinate systems. It MUST be omitted otherwise.
 
 #### direction
 The direction of increasing coordinate values. The direction MUST be given for an axis using numeric coordinate values; it MAY be given for a string-valued or ordinal axis if the axis has a natural direction, it SHOULD be omitted otherwise. The value of the `"direction"` field MUST be taken from [Table 48](https://docs.ogc.org/as/18-005r5/18-005r5.html#table_48) of the OGC Standard "Referencing by Coordinates".
@@ -111,20 +108,39 @@ For interoperability and ease of interpretation, the following arrangement, as a
 | "X" | "longitude", "easting" | "east" |
 | "Y" | "latitude", "northing" | "north" |
 | "Z" | "pressure", "depth", "elevation" | "up", "down" * |
-| "T" | "time" | "future" |
+| "T" | "time" | "future", "past" * |
 | others | Any name | Any appropriate value or omitted |
 _\* Depending on which way increasing coordinate values go. For instance, pressure and depth are positive down, elevation is positive up._
 
 In image data with a typical coordinate system made up of the (X, Y) coordinate values of the upper-left corner and a pixel size, the direction for the Y axis will still be "north" but the `"increment"` value in the `"values"` parameter of the Y axis will be negative.
 
-#### unit
-The unit-of-measure of coordinate values is expressed using the [`uom` convention](https://github.com/clbarnes/zarr-convention-uom). It MUST be specified for axes with numeric coordinate values, it MAY NOT be specified for temporal, string-valued or ordinal axes.
-
 #### attributes
 Any additional attributes of the axis. This convention does not require or place restrictions on any of these attributes. The interpretation of the attributes is left to the application.
 
+### Coordinates object
+An axis may have multiple sets of coordinates. A typical scenario would be an axis representing categorical data where there are multiple sets of categories.
+
+If this field is omitted, the axis is ordinal, i.e. a sequence `0..n-1` with `n` being the length of the dimension of the shape that this axis refers to. This field MUST be specified for all other types of axes.
+
+| Field Name   | Type     | Description                    | Required    |
+| ------------ | ---------| ------------------------------ | ----------- |
+| name         | string   | Name of the set of coordinates. | No         |
+| unit         | [Unit object](#unit-object) | Unit-of-measure of the coordinates. | Conditional |
+| time         | [Time object](#time-object) | Time definition for temporal coordinates. | Conditional |
+| values       | [Values object](#values-object) | The values of the coordinates. | Yes        |
+| boundaries   | [Boundaries object](#boundaries-object) | Boundary values of the coordinates. | Conditional |
+| attributes   | {} | Any other attributes of the coordinates. | No |
+
+#### name
+A short name that describes this set of coordinates. The name MAY NOT be used by any other set of coordinates for this axis.
+
+### Unit object
+The unit-of-measure of coordinate values can be expressed as a simple string or using the [`uom` convention](https://github.com/clbarnes/zarr-convention-uom). It MUST be specified for numeric coordinate values, it MAY NOT be specified for temporal or string-valued coordinates or ordinal axes.
+
+When the unit is conventional and commonly understood a simple string value suffices, such as `"m"` or `"kg m-2 s-1"`. If the unit is uncommon or more complex, use of the `uom` convention is recommended.
+
 ### Time object
-The temporal dimension is specified using a reference date-time and a calendar, using the specification of the [CF Metadata Conventions](https://cfconventions.org/cf-conventions/cf-conventions.html#time-coordinate). It MUST be specified for an axis representing the temporal domain, it MAY NOT be specified otherwise.
+Temporal coordinates are specified using a reference date-time and a calendar, using the specification of the [CF Metadata Conventions](https://cfconventions.org/cf-conventions/cf-conventions.html#time-coordinate). It MUST be specified for an axis representing the temporal domain, it MAY NOT be specified otherwise.
 
 | Field Name | Type   | Description                                           | Required  |
 | ---------- | -------| ----------------------------------------------------- | --------- |
@@ -132,13 +148,13 @@ The temporal dimension is specified using a reference date-time and a calendar, 
 | calendar   | string | Name of a calendar. | No |
 
 #### reference
-The reference date-time from which time coordinates are calculated. This takes the form of `"days since 1949-12-01"`.
+The reference date-time from which time coordinates are calculated. This takes the form of `"<time unit> since <timestamp>"`, e.g. `"days since 1949-12-01T12:00:00"`.
 
 #### calendar
 A calendar to use for the calculations. This can be a common calendar or a model calendar as used in climate projection data sets. This field is recommended but it may be omitted, in which case the calendar will be application-defined, typically `"standard"` or `"proleptic_gregorian"`.
 
 ### Values object
-The values of an axis are usually (but not necessarily) its coordinates. They can be represented in different ways. One, and only one, of the below fields MUST be specified.
+The values the coordinates can be represented in different ways. One, and only one, of the below fields MUST be specified.
 
 | Field Name | Type     | Description                                           | Required    |
 | ---------- | ---------| ----------------------------------------------------- | ----------- |
@@ -147,7 +163,7 @@ The values of an axis are usually (but not necessarily) its coordinates. They ca
 | explicit   | []       | JSON array of coordinate values.                      | Conditional |
 
 #### regular
-This method is preferred when the numeric coordinate values of the axis are equally spaced and thus monotonically increasing or decreasing. The JSON array consists of the coordinate of the first element along the dimension (at shape index `0`), followed by the increment to make subsequent coordinate values, possibly negative. The increment may not be 0.
+This method is preferred when the numeric coordinate values are equally spaced and thus monotonically increasing or decreasing. The JSON array consists of the coordinate of the first element along the dimension (at shape index `0`) of the axis, followed by the increment to make subsequent coordinate values, possibly negative. The increment may not be 0.
 
 #### external
 When coordinate values are irregular or for long string-valued axes, the coordinate values should be supplied in a 1-dimensional array elsewhere in the Zarr store. This parameter gives the path to the array with the coordinate values. That array MUST have one dimension in its `shape`, whose value is identical to the dimension in the `shape` of this array that the axis refers to.
@@ -157,9 +173,9 @@ For short (string-valued) axes (max. 20 ~ 25 elements) and single-valued axes th
 
 ### Boundaries object
 
-By default, numeric coordinate values represent a point in the coordinate space. If the coordinate is representative for a finite extent in the coordinate space of the axis, the boundary values of the axis specify the extent. The boundary values can be represented in different ways. One, and only one, of the below fields MUST be specified if the coordinate value represents a finite extent; this clause MUST be omitted if the coordinates represent a point.
+By default, numeric coordinate values represent a point in the coordinate space. If the coordinate is representative for a finite extent in the coordinate space of the axis, the boundary values of the coordinates specify the extent. The boundary values can be represented in different ways. One, and only one, of the below fields MUST be specified if the coordinate values represent a finite extent; this clause MUST be omitted if the coordinates represent a point.
 
-Boundary values are only applicable to axes whose coordinates are expressed in numeric values. They SHOULD NOT be specified for string-type or ordinal axes.
+Boundary values are only applicable to coordinates expressed in numeric values. They SHOULD NOT be specified for string-type or ordinal axes.
 
 | Field Name | Type     | Description                                                      | Required    |
 | ---------- | ---------| ---------------------------------------------------------------- | ----------- |
@@ -191,10 +207,6 @@ A typical CMIP6 data set contains a single data variable. The coordinate system 
       {
         "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/tags/v1/schema.json",
         "name": "cs"
-      },
-      {
-        "schema_url": "https://raw.githubusercontent.com/clbarnes/zarr-convention-uom/refs/tags/v1/schema.json",
-        "name": "uom"
       }
     ],
     "cs": {
@@ -203,65 +215,65 @@ A typical CMIP6 data set contains a single data variable. The coordinate system 
           "name": "lon",
           "abbreviation": "X",
           "direction": "east",
-          "unit": {
-            "uom": {
-              "ucum": {
-                "unit": "degrees"
+          "coordinates" [
+            {
+              "unit": "degrees",
+              "values": {
+                "regular": [0.625, 1.25]
+              },
+              "boundaries": {
+                "regular": [-0.625, 0.625]
               }
             }
-          },
-          "values": {
-            "regular": [0.625, 1.25]
-          },
-          "boundaries": {
-            "regular": [-0.625, 0.625]
-          }
+          ]
         },
         {
           "name": "lat",
           "abbreviation": "Y",
           "direction": "north",
-          "unit": {
-            "uom": {
-              "ucum": {
-                "unit": "degrees"
+          "coordinates": [
+            {
+              "unit": "degrees",
+              "values": {
+                "regular": [-89.5, 1]
+              },
+              "boundaries": {
+                "regular": [-0.5, 0.5]
               }
             }
-          },
-          "values": {
-            "regular": [-89.5, 1]
-          },
-          "boundaries": {
-            "regular": [-0.5, 0.5]
-          }
+          ]
         },
         {
           "name": "time",
           "abbreviation": "T",
           "direction": "future",
-          "time": {
-            "reference": "days since 1850-01-01",
-            "calendar": "noleap"
-          },
-          "values": {
-            "regular": [27895.5, 1]
-          },
-          "boundaries": {
-            "regular": [-0.5, 0.5]
-          }
+          "coordinates": [
+            {
+              "time": {
+                "reference": "days since 1850-01-01",
+                "calendar": "noleap"
+              },
+              "values": {
+                "regular": [27895.5, 1]
+              },
+              "boundaries": {
+                "regular": [-0.5, 0.5]
+              }
+            }
+          ]
         },
         {
           "name": "height",
           "abbreviation": "Z",
           "direction": "up",
-          "unit": {
-            "uom": {
-              "unit": "metre"
+          "coordinates": [
+            {
+              "unit": "meter",
+              "values": {
+                "explicit": [2]
+              }
             }
-          },
-          "values": {
-            "explicit": [2]
-          }
+          ]
         }
       ]
     }
@@ -287,10 +299,6 @@ As the previous example, less the single-valued axis, but now the temporal dimen
         "name": "cs"
       },
       {
-        "schema_url": "https://raw.githubusercontent.com/clbarnes/zarr-convention-uom/refs/tags/v1/schema.json",
-        "name": "uom"
-      },
-      {
         "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/main/schema.json",
         "name": "ref"
       }
@@ -301,60 +309,56 @@ As the previous example, less the single-valued axis, but now the temporal dimen
           "name": "lon",
           "abbreviation": "X",
           "direction": "east",
-          "unit": {
-            "uom": {
-              "ucum": {
-                "unit": "degrees"
+          "coordinates": [
+            {
+              "unit": "degrees",
+              "values": {
+                "regular": [0.625, 1.25]
+              },
+              "boundaries": {
+                "regular": [-0.625, 0.625]
               }
             }
-          },
-          "values": {
-            "regular": [0.625, 1.25]
-          },
-          "boundaries": {
-            "regular": [-0.625, 0.625]
-          }
+          ]
         },
         {
           "name": "lat",
           "abbreviation": "Y",
           "direction": "north",
-          "unit": {
-            "uom": {
-              "ucum": {
-                "unit": "degrees"
+          "coordinates": [
+            {
+              "unit": "degrees",
+              "values": {
+                "regular": [-89.5, 1]
+              },
+              "boundaries": {
+                "regular": [-0.5, 0.5]
               }
             }
-          },
-          "values": {
-            "regular": [-89.5, 1]
-          },
-          "boundaries": {
-            "regular": [-0.5, 0.5]
-          }
+          ]
         },
         {
           "name": "time",
           "abbreviation": "T",
           "direction": "future",
-          "time": {
-            "reference": "days since 1850-01-01",
-            "calendar": "noleap"
-          },
-          "values": {
-            "external": {
-              "ref": {
-                "array": "time"
+          "coordinates": [
+            {
+              "time": {
+                "reference": "days since 1850-01-01",
+                "calendar": "noleap"
+              },
+              "values": {
+                "external": {
+                  "array": "time"
+                }
+              },
+              "boundaries": {
+                "external": {
+                  "array": "time_bnds"
+                }
               }
             }
-          },
-          "boundaries": {
-            "external": {
-              "ref": {
-                "array": "time_bnds"
-              }
-            }
-          }
+          ]
         }
       ]
     }
@@ -379,10 +383,6 @@ The CRU data files usually have a single data variable but an additional variabl
         "name": "cs"
       },
       {
-        "schema_url": "https://raw.githubusercontent.com/clbarnes/zarr-convention-uom/refs/tags/v1/schema.json",
-        "name": "uom"
-      },
-      {
         "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/main/schema.json",
         "name": "ref"
       }
@@ -394,47 +394,47 @@ The CRU data files usually have a single data variable but an additional variabl
           "name": "lon",
           "abbreviation": "X",
           "direction": "east",
-          "unit": {
-            "uom": {
-              "ucum": {
-                "unit": "degrees"
+          "coordinates": [
+            {
+              "unit": "degrees",
+              "values": {
+                "regular": [-179.75, 0.5]
               }
             }
-          },
-          "values": {
-            "regular": [-179.75, 0.5]
-          }
+          ]
         },
         {
           "name": "lat",
           "abbreviation": "Y",
           "direction": "north",
-          "unit": {
-            "uom": {
-              "ucum": {
-                "unit": "degrees"
+          "coordinates": [
+            {
+              "unit": "degrees",
+              "values": {
+                "regular": [-89.75, 0.5]
               }
             }
-          },
-          "values": {
-            "regular": [-89.75, 0.5]
-          }
+          ]
         },
         {
           "name": "time",
           "abbreviation": "T",
           "direction": "future",
-          "time": {
-            "reference": "days since 1900-01-01",
-            "calendar": "standard"
-          },
-          "values": {
-            "external": {
-              "ref": {
-                "array": "time"
+          "coordinates": [
+            {
+              "time": {
+                "reference": "days since 1900-01-01",
+                "calendar": "standard"
+              },
+              "values": {
+                "external": {
+                  "ref": {
+                    "array": "time"
+                  }
+                }
               }
             }
-          }
+          ]
         }
       ]
     }
@@ -463,7 +463,8 @@ The CRU data files usually have a single data variable but an additional variabl
       "composite": {
         "ref": {
           "group": "/",
-          "attribute": "/attributes/cs/CRU_cs"
+          "attribute": "/attributes/cs",
+          "name": "CRU_cs"
         }
       }
     }
@@ -493,24 +494,32 @@ A climatological dataset by geographic regions, summarised to a single date-time
       "axes": [
         {
           "name": "geo_region",
-          "values": {
-            "explicit": ["Anglian", "Argyll", "Clyde", "Dee", "Forth", "Humber", "Neagh Bann", "North East Scotland", "North Eastern Ireland", "North Highland", "North West England", "North Western Ireland", "Northumbria", "Orkney and Shetland", "Severn", "Solway", "South East England", "South West England", "Tay", "Thames", "Tweed", "West Highland", "Western Wales"]
-          }
+          "coordinates": [
+            {
+              "values": {
+                "explicit": ["Anglian", "Argyll", "Clyde", "Dee", "Forth", "Humber", "Neagh Bann", "North East Scotland", "North Eastern Ireland", "North Highland", "North West England", "North Western Ireland", "Northumbria", "Orkney and Shetland", "Severn", "Solway", "South East England", "South West England", "Tay", "Thames", "Tweed", "West Highland", "Western Wales"]
+              }
+            }
+          ]
         },
         {
           "name": "time",
           "abbreviation": "T",
           "direction": "future",
-          "time": {
-            "reference": "hours since 1800-01-01",
-            "calendar": "standard"
-          },
-          "values": {
-            "explicit": [1678608]
-          },
-          "boundaries": {
-            "explicit": [1674264, 1937232]
-          }
+          "coordinates": [
+            {
+              "time": {
+                "reference": "hours since 1800-01-01",
+                "calendar": "standard"
+              },
+              "values": {
+                "explicit": [1678608]
+              },
+              "boundaries": {
+                "regular": [-4344, 258624]
+              }
+            }
+          ]
         }
       ]
     }

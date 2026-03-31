@@ -1,0 +1,26 @@
+{
+  "zarr_format": 3,
+  "node_type": "array",
+  "dimension_names": ["time", "lat", "lon"],
+  "attributes": {
+    "zarr_conventions": [
+      {
+        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/tags/v1/schema.json",
+        "name": "cs"
+      },
+      {
+        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/main/schema.json",
+        "name": "ref"
+      }
+    ],
+    "cs": {
+      "composite": [
+        {
+          "group": "/",
+          "attribute": "/attributes/cs",
+          "name": "CRU_cs"
+        }
+      ]
+    }
+  }
+}

@@ -70,21 +70,15 @@
         }
       },
       "anyOf": [
-        {
-          "required": ["schema_url"]
-        },
-        {
-          "required": ["spec_url"]
-        },
-        {
-          "required": ["uuid"]
-        }
+        { "required": ["schema_url"] },
+        { "required": ["spec_url"] },
+        { "required": ["uuid"] }
       ],
       "additionalProperties": false
     },
     "cs": {
       "type": "object",
-      "description": "Coordinate system convention properties",
+      "description": "Coordinate system for n-dimensional arrays",
       "properties": {
         "name": {
           "type": "string",
@@ -93,7 +87,7 @@
         "composite": {
           "type": "array",
           "items": {
-            "$ref": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/tags/v1/schema.json#/$defs/ref"
+            "$ref": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/main/schema.json#/$defs/ref"
           }
         },
         "axes": {
@@ -115,7 +109,7 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "Required. Name of the axis."
+          "description": "Name of the axis. Required."
         },
         "abbreviation": {
           "type": "string",
@@ -125,20 +119,55 @@
           "type": "string",
           "description": "The direction of increasing coordinate values. Its value must be taken from Table 48 of OGC standard \"Referencing by Coordinates\"."
         },
+        "coordinates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/coordinates"
+          }
+        }
+      },
+      "required": ["name"],
+      "additionalProperties": true
+    },
+    "coordinates": {
+      "type": "object",
+      "description": "Properties of a set of coordinates",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the set of coordinates."
+        },
         "unit": {
-          "$ref": "https://raw.githubusercontent.com/clbarnes/zarr-convention-uom/refs/tags/v1/schema.json#/$defs/uom"
+          "oneOf": [
+            { "type": "string" },
+            { "$ref": "https://raw.githubusercontent.com/clbarnes/zarr-convention-uom/refs/tags/v1/schema.json#/$defs/uom" }
+          ]
         },
         "time": {
-          "type": "string"
+          "$ref": "#/$defs/time"
         },
         "values": {
           "$ref": "#/$defs/values"
         },
         "boundaries": {
-          "$ref": "#/$defs/bounds"
+          "$ref": "#/$defs/boundaries"
         }
       },
-      "required": ["name", "values"],
+      "required": ["values"],
+      "additionalProperties": true
+    },
+    "time": {
+      "type": "object",
+      "description": "The time definition of a set of coordinates.",
+      "properties": {
+        "reference": {
+          "type": "string"
+        },
+        "calendar": {
+          "type": "string"
+        }
+      },
+      "required": ["reference"],
       "additionalProperties": true
     },
     "values": {
@@ -155,7 +184,7 @@
           "maxItems": 2
         },
         "external": {
-          "$ref": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/tags/v1/schema.json#/$defs/ref",
+          "$ref": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/main/schema.json#/$defs/ref",
           "description": "Path to a 1-dimensional array with coordinate values."
         },
         "explicit": {
@@ -184,7 +213,7 @@
           "maxItems": 2
         },
         "external": {
-          "$ref": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/tags/v1/schema.json#/$defs/ref",
+          "$ref": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/main/schema.json#/$defs/ref",
           "description": "Path to an array providing boundary values."
         }
       },

@@ -10,12 +10,25 @@ if (!schemaPath || !dataPath) {
   process.exit(1);
 }
 
+const ajv = new Ajv2020({ allErrors: true });
+
+// Fetch and add external schemas by their $id / URI
+const externalSchemas = [
+  "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/main/schema.json",
+  "https://raw.githubusercontent.com/clbarnes/zarr-convention-uom/refs/tags/v1/schema.json"
+];
+
+for (const url of externalSchemas) {
+  const schema = await fetch(url).then(r => r.json());
+  // Pass the URL as explicit key to handle any $id mismatch
+  ajv.addSchema(schema, url);
+}
+
 // Read files
 const schema = JSON.parse(fs.readFileSync(schemaPath, "utf8"));
 const data = JSON.parse(fs.readFileSync(dataPath, "utf8"));
 
 // Validate
-const ajv = new Ajv2020({ allErrors: true });
 const validate = ajv.compile(schema);
 const valid = validate(data);
 
