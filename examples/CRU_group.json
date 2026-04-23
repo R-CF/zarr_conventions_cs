@@ -4,7 +4,7 @@
   "attributes": {
     "zarr_conventions": [
       {
-        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/tags/v1/schema.json",
+        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/main/schema.json",
         "name": "cs"
       },
       {
@@ -12,54 +12,62 @@
         "name": "ref"
       }
     ],
-    "cs": {
-      "name": "CRU_cs",
-      "axes": [
-        {
-          "name": "lon",
-          "abbreviation": "X",
-          "direction": "east",
-          "coordinates": [
-            {
-              "unit": "degrees",
-              "values": {
-                "regular": [-179.75, 0.5]
-              }
-            }
-          ]
-        },
-        {
-          "name": "lat",
-          "abbreviation": "Y",
-          "direction": "north",
-          "coordinates": [
-            {
-              "unit": "degrees",
-              "values": {
-                "regular": [-89.75, 0.5]
-              }
-            }
-          ]
-        },
-        {
-          "name": "time",
-          "abbreviation": "T",
-          "direction": "future",
-          "coordinates": [
-            {
-              "time": {
-                "reference": "days since 1900-01-01",
-                "calendar": "standard"
-              },
-              "values": {
-                "external": {
-                  "array": "time"
+    "crs": {
+      "WGS84": {
+        "axes": [
+          {
+            "name": "lon",
+            "abbreviation": "X",
+            "direction": "east",
+            "coordinates": [
+              {
+                "unit": "degrees",
+                "values": {
+                  "regular": [-179.75, 0.5]
                 }
               }
-            }
-          ]
+            ]
+          },
+          {
+            "name": "lat",
+            "abbreviation": "Y",
+            "direction": "north",
+            "coordinates": [
+              {
+                "unit": "degrees",
+                "values": {
+                  "regular": [-89.75, 0.5]
+                }
+              }
+            ]
+          }
+        ],
+        "id": {
+          "proj:code": "EPSG:4326"
         }
-      ]
+      },
+      "standard_calendar": {
+        "axes": [
+          {
+            "name": "time",
+            "abbreviation": "T",
+            "direction": "future",
+            "coordinates": [
+              {
+                "time": {
+                  "reference": "days since 1900-01-01",
+                  "calendar": "standard"
+                },
+                "values": {
+                  "external": {
+                    "node": "time"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
     }
   }
 }

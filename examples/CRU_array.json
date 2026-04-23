@@ -1,11 +1,12 @@
 {
   "zarr_format": 3,
   "node_type": "array",
+  "shape": [1464, 360, 720],
   "dimension_names": ["time", "lat", "lon"],
   "attributes": {
     "zarr_conventions": [
       {
-        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/tags/v1/schema.json",
+        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/main/schema.json",
         "name": "cs"
       },
       {
@@ -14,11 +15,14 @@
       }
     ],
     "cs": {
-      "composite": [
+      "crs": [
         {
-          "group": "/",
-          "attribute": "/attributes/cs",
-          "name": "CRU_cs"
+          "node": "/",
+          "attribute": "/attributes/crs/WGS84"
+        },
+        {
+          "node": "/",
+          "attribute": "/attributes/crs/standard_calendar"
         }
       ]
     }

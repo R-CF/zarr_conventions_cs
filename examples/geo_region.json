@@ -6,38 +6,46 @@
   "attributes": {
     "zarr_conventions": [
       {
-        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/tags/v1/schema.json",
+        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/main/schema.json",
         "name": "cs"
       }
     ],
     "cs": {
-      "axes": [
+      "crs": [
         {
-          "name": "geo_region",
-          "coordinates": [
+          "axes": [
             {
-              "values": {
-                "explicit": ["Anglian", "Argyll", "Clyde", "Dee", "Forth", "Humber", "Neagh Bann", "North East Scotland", "North Eastern Ireland", "North Highland", "North West England", "North Western Ireland", "Northumbria", "Orkney and Shetland", "Severn", "Solway", "South East England", "South West England", "Tay", "Thames", "Tweed", "West Highland", "Western Wales"]
-              }
+              "name": "geo_region",
+              "coordinates": [
+                {
+                  "values": {
+                    "explicit": ["Anglian", "Argyll", "Clyde", "Dee", "Forth", "Humber", "Neagh Bann", "North East Scotland", "North Eastern Ireland", "North Highland", "North West England", "North Western Ireland", "Northumbria", "Orkney and Shetland", "Severn", "Solway", "South East England", "South West England", "Tay", "Thames", "Tweed", "West Highland", "Western Wales"]
+                  }
+                }
+              ]
             }
           ]
         },
         {
-          "name": "time",
-          "abbreviation": "T",
-          "direction": "future",
-          "coordinates": [
+          "axes": [
             {
-              "time": {
-                "reference": "hours since 1800-01-01",
-                "calendar": "standard"
-              },
-              "values": {
-                "explicit": [1678608]
-              },
-              "boundaries": {
-                "regular": [-4344, 258624]
-              }
+              "name": "time",
+              "abbreviation": "T",
+              "direction": "future",
+              "coordinates": [
+                {
+                  "time": {
+                    "reference": "hours since 1800-01-01",
+                    "calendar": "standard"
+                  },
+                  "values": {
+                    "explicit": [1678608]
+                  },
+                  "boundaries": {
+                    "regular": [-4344, 258624]
+                  }
+                }
+              ]
             }
           ]
         }

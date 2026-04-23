@@ -1,11 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Coordinate System Convention",
-  "description": "Schema for the coordinate system convention",
+  "title": "Coordinate Set Convention",
+  "description": "Schema for the coordinate set convention",
   "type": "object",
   "properties": {
     "zarr_format": {
       "type": "integer",
+      "enum": [2, 3],
       "description": "Zarr format version"
     },
     "node_type": {
@@ -19,6 +20,14 @@
         "type": "number"
       }
     },
+    "dimension_names": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+      }
+    },
     "attributes": {
       "type": "object",
       "description": "Zarr attributes containing convention metadata and properties",
@@ -29,15 +38,49 @@
           "contains": {
             "$ref": "#/$defs/conventionMetadata"
           }
-        },
-        "cs": {
-          "$ref": "#/$defs/cs"
         }
       },
-      "required": ["zarr_conventions", "cs"]
+      "required": ["zarr_conventions"]
     }
   },
   "required": ["zarr_format", "node_type", "attributes"],
+  "if": {
+    "properties": {
+      "node_type": { "const": "array"}
+    }
+  },
+  "then": {
+    "required": ["shape", "dimension_names"],
+    "properties": {
+      "attributes": {
+        "type": "object",
+        "required": ["cs"],
+        "properties": {
+          "cs": {
+            "$ref": "#/$defs/cs"
+          }
+        }
+      }
+    }
+  },
+  "else": {
+    "properties": {
+      "attributes": {
+        "type": "object",
+        "required": ["crs"],
+        "properties": {
+          "crs": {
+            "type": "object",
+            "description": "Keyed CRS objects stored in a Zarr group, keyed by CRS name",
+            "minProperties": 1,
+            "additionalProperties": {
+              "$ref": "#/$defs/crs"
+            }
+          }
+        }
+      }
+    }
+  },
   "additionalProperties": true,
   "$defs": {
     "conventionMetadata": {
@@ -46,12 +89,12 @@
       "properties": {
         "schema_url": {
           "type": "string",
-          "const": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/tags/v1/schema.json",
+          "const": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/main/schema.json",
           "description": "URL to the JSON Schema definition for this convention"
         },
         "spec_url": {
           "type": "string",
-          "const": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/tags/v1/README.md",
+          "const": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/main/README.md",
           "description": "URL to the full specification document"
         },
         "uuid": {
@@ -65,7 +108,7 @@
         },
         "description": {
           "type": "string",
-          "const": "Coordinate system convention for Zarr arrays",
+          "const": "Coordinate set convention for Zarr arrays",
           "description": "Convention to assign semantic meaning to the dimensions of Zarr arrays, using axes and coordinates"
         }
       },
@@ -78,17 +121,34 @@
     },
     "cs": {
       "type": "object",
-      "description": "Coordinate system for n-dimensional arrays",
+      "description": "Coordinate set for n-dimensional arrays",
       "properties": {
         "name": {
           "type": "string",
-          "description": "Descriptive name for the coordinate system. Optional for arrays, required for groups."
+          "description": "Descriptive name for the coordinate set."
         },
-        "composite": {
+        "crs": {
           "type": "array",
           "items": {
-            "$ref": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/main/schema.json#/$defs/ref"
+            "oneOf": [
+              { "$ref": "#/$defs/crs" },
+              { "$ref": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/main/schema.json#/$defs/ref" }
+            ]
           }
+        },
+        "id": {
+          "$ref": "https://raw.githubusercontent.com/zarr-conventions/geo-proj/main/schema.json#/$defs/projAttributes"
+        }
+      },
+      "required": ["crs"]
+    },
+    "crs": {
+      "type": "object",
+      "description": "CRS definition.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Descriptive name for the coordinate reference system."
         },
         "axes": {
           "type": "array",
@@ -97,15 +157,12 @@
           }
         }
       },
-      "anyOf": [
-        { "required": ["composite"] },
-        { "required": ["axes"] }
-      ],
+      "required": ["axes"],
       "additionalProperties": true
     },
     "axis": {
       "type": "object",
-      "description": "Properties of an individual axis",
+      "description": "Properties of an individual axis.",
       "properties": {
         "name": {
           "type": "string",
