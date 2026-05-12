@@ -22,9 +22,9 @@
             {
               "name": "lon",
               "abbreviation": "X",
-              "direction": "east",
               "coordinates": [
                 {
+                  "direction": "east",
                   "unit": "degrees",
                   "values": {
                     "regular": [0.625, 1.25]
@@ -38,9 +38,9 @@
             {
               "name": "lat",
               "abbreviation": "Y",
-              "direction": "north",
               "coordinates": [
                 {
+                  "direction": "north",
                   "unit": "degrees",
                   "values": {
                     "regular": [-89.5, 1]
@@ -62,9 +62,9 @@
             {
               "name": "time",
               "abbreviation": "T",
-              "direction": "future",
               "coordinates": [
                 {
+                  "direction": "future",
                   "time": {
                     "reference": "days since 1850-01-01",
                     "calendar": "noleap"
@@ -86,9 +86,9 @@
             {
               "name": "height",
               "abbreviation": "Z",
-              "direction": "up",
               "coordinates": [
                 {
+                  "direction": "up",
                   "unit": "meter",
                   "values": {
                     "explicit": [2]

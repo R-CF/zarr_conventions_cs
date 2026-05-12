@@ -153,34 +153,16 @@ The axis object defines all the properties of an individual axis.
 
 | Field Name   | Type     | Description                    | Required    |
 | ------------ | ---------| ------------------------------ | ----------- |
-| name         | string   | Name of the axis.              | Yes         |
-| abbreviation | string   | Abbreviation of the axis name. | Conditional |
-| direction    | string   | Direction of the axis.         | Conditional |
-| coordinates  | [[Coordinates object](#coordinates-object)] | Array of coordinates for the axis. | Conditional |
-| attributes   | object   | Any other attributes of the axis. | No |
+| name         | string   | Name of the axis               | Yes         |
+| abbreviation | string   | Abbreviation of the axis name  | Conditional |
+| coordinates  | [[Coordinates object](#coordinates-object)] | Array of coordinates for the axis | Conditional |
+| attributes   | object   | Any other attributes of the axis | No |
 
 #### name
 A short name that describes this axis. The name MUST be present in the `dimension_names` attribute of the array, unless the axis is single-valued. The name MAY NOT be used by any other axis in the CRS, including across composited CRSs.
 
 #### abbreviation
 The abbreviation of the axis. It MUST be provided for axes that are in the spatio-temporal domain, using one of the values `"X"`, `"Y"`, `"Z"` or `"T"`, as appropriate. There may be only one occurrence of any of the abbreviations in the CRS, including across composited CRSs. It MUST be omitted otherwise.
-
-#### direction
-The direction of increasing coordinate values. The direction MUST be given for an axis using numeric coordinate values; it MAY be given for a string-valued or ordinal axis if the axis has a natural direction, it SHOULD be omitted otherwise. The value of the `"direction"` field MUST be taken from [Table 48](https://docs.ogc.org/as/18-005r5/18-005r5.html#table_48) of the OGC Standard "Referencing by Coordinates".
-
-For interoperability and ease of interpretation, the following arrangement, as appropriate, is strongly recommended:
-
-| abbreviation | typical name | direction |
-| - | - | - |
-| "X" | "longitude", "easting" | "east" |
-| "Y" | "latitude", "northing" | "north" |
-| "Z" | "pressure", "depth", "elevation" | "up", "down" * |
-| "T" | "time" | "future", "past" * |
-| others | Any name | Any appropriate value or omitted |
-
-_\* Depending on which way increasing coordinate values go. For instance, pressure and depth are positive down, elevation is positive up._
-
-In image data with a typical coordinate system made up of the (X, Y) coordinate values of the upper-left corner and a grid cell size, the direction for the Y axis will still be "north" but the `"increment"` value in the `"values"` parameter of the Y axis will be negative.
 
 #### coordinates
 An array of `coordinates` objects.
@@ -195,15 +177,33 @@ If this field is omitted, the axis is of ordinal type, i.e. a sequence `0..n-1` 
 
 | Field Name   | Type     | Description                    | Required    |
 | ------------ | ---------| ------------------------------ | ----------- |
-| name         | string   | Name of the set of coordinates. | No         |
-| unit         | [Unit object](#unit-object) | Unit-of-measure of the coordinates. | Conditional |
-| time         | [Time object](#time-object) | Time definition for temporal coordinates. | Conditional |
-| values       | [Values object](#values-object) | The values of the coordinates. | Yes        |
-| boundaries   | [Boundaries object](#boundaries-object) | Boundary values of the coordinates. | Conditional |
-| attributes   | object | Any other attributes of the coordinates. | No |
+| name         | string   | Name of the set of coordinates | No         |
+| direction    | string   | Direction of the coordinates   | Conditional |
+| unit         | [Unit object](#unit-object) | Unit-of-measure of the coordinates | Conditional |
+| time         | [Time object](#time-object) | Time definition for temporal coordinates | Conditional |
+| values       | [Values object](#values-object) | The values of the coordinates | Yes        |
+| boundaries   | [Boundaries object](#boundaries-object) | Boundary values of the coordinates | Conditional |
+| attributes   | object   | Any other attributes of the coordinates | No |
 
 #### name
 A short name that describes this set of coordinates. The name MAY NOT be used by any other set of coordinates for this axis.
+
+#### direction
+The direction of increasing coordinate values. The direction MUST be given for numeric coordinate values; it MAY be given for a string-valued or ordinal values if the associated axis has a natural direction, it SHOULD be omitted otherwise. The value of the `"direction"` field MUST be taken from [Table 48](https://docs.ogc.org/as/18-005r5/18-005r5.html#table_48) of the OGC Standard "Referencing by Coordinates".
+
+For interoperability and ease of interpretation, the following arrangement, as appropriate, is strongly recommended:
+
+| axis abbreviation | typical axis name | direction |
+| - | - | - |
+| "X" | "longitude", "easting" | "east" |
+| "Y" | "latitude", "northing" | "north" |
+| "Z" | "pressure", "depth", "elevation" | "up", "down" * |
+| "T" | "time" | "future", "past" * |
+| others | Any name | Any appropriate value or omitted |
+
+_\* Depending on which way increasing coordinate values go. For instance, pressure and depth are positive down, elevation is positive up._
+
+In image data with a typical coordinate system made up of the (X, Y) coordinate values of the upper-left corner and a grid cell size, the direction for the Y values will still be "north" but the `"increment"` value in the `"values"` field will be negative.
 
 ### Unit object
 The unit-of-measure of coordinate values can be expressed as a simple string or using the [`uom` convention](https://github.com/clbarnes/zarr-convention-uom). It MUST be specified for numeric coordinate values, it MAY NOT be specified for temporal or string-valued coordinates or ordinal axes.

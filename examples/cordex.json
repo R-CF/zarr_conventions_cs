@@ -22,9 +22,9 @@
             {
               "name": "rlon",
               "abbreviation": "X",
-              "direction": "east",
               "coordinates": [
                 {
+                  "direction": "east",
                   "unit": "degrees",
                   "values": {
                     "regular": [-28.375, 0.11]
@@ -35,9 +35,9 @@
             {
               "name": "rlat",
               "abbreviation": "Y",
-              "direction": "north",
               "coordinates": [
                 {
+                  "direction": "north",
                   "unit": "degrees",
                   "values": {
                     "regular": [-23.375, 0.11]
@@ -66,9 +66,9 @@
             {
               "name": "time",
               "abbreviation": "T",
-              "direction": "future",
               "coordinates": [
                 {
+                  "direction": "future",
                   "time": {
                     "reference": "days since 1949-12-01",
                     "calendar": "360_day"

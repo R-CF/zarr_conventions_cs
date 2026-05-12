@@ -31,9 +31,9 @@
             {
               "name": "time",
               "abbreviation": "T",
-              "direction": "future",
               "coordinates": [
                 {
+                  "direction": "future",
                   "time": {
                     "reference": "hours since 1800-01-01",
                     "calendar": "standard"
