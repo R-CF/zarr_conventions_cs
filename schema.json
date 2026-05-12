@@ -155,6 +155,12 @@
           "items": {
             "$ref": "#/$defs/axis"
           }
+        },
+        "id": {
+          "$ref": "https://raw.githubusercontent.com/zarr-conventions/geo-proj/main/schema.json#/$defs/projAttributes"
+        },
+        "geolocation": {
+          "$ref": "https://raw.githubusercontent.com/R-CF/zarr_convention_geolocation/main/schema.json#/$defs/geolocation"
         }
       },
       "required": ["axes"],
@@ -242,7 +248,7 @@
         },
         "external": {
           "$ref": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/main/schema.json#/$defs/ref",
-          "description": "Path to a 1-dimensional array with coordinate values."
+          "description": "Reference to a 1-dimensional array with coordinate values."
         },
         "explicit": {
           "type": "array",

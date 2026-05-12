@@ -1,8 +1,8 @@
 {
   "zarr_format": 3,
   "node_type": "array",
-  "shape": [8605, 180, 288],
-  "dimension_names": ["time", "lat", "lon"],
+  "shape": [1800, 412, 424],
+  "dimension_names": ["time", "rlat", "rlon"],
   "attributes": {
     "zarr_conventions": [
       {
@@ -10,54 +10,58 @@
         "name": "cs"
       },
       {
-        "schema_url": "https://raw.githubusercontent.com/zarr-conventions/geo-proj/main/schema.json",
-        "name": "proj:"
+        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_geolocation/main/schema.json",
+        "name": "geolocation"
       }
     ],
     "cs": {
       "crs": [
         {
-          "name": "WGS84",
+          "name": "rotated pole grid for CORDEX EUR-11 domain",
           "axes": [
             {
-              "name": "lon",
+              "name": "rlon",
               "abbreviation": "X",
               "direction": "east",
               "coordinates": [
                 {
                   "unit": "degrees",
                   "values": {
-                    "regular": [0.625, 1.25]
-                  },
-                  "boundaries": {
-                    "regular": [-0.625, 0.625]
+                    "regular": [-28.375, 0.11]
                   }
                 }
               ]
             },
             {
-              "name": "lat",
+              "name": "rlat",
               "abbreviation": "Y",
               "direction": "north",
               "coordinates": [
                 {
                   "unit": "degrees",
                   "values": {
-                    "regular": [-89.5, 1]
-                  },
-                  "boundaries": {
-                    "regular": [-0.5, 0.5]
+                    "regular": [-23.375, 0.11]
                   }
                 }
               ]
             }
           ],
-          "id": {
-            "proj:code": "EPSG:4326"
+          "geolocation": {
+            "geodetic": {
+              "x": {
+                "node": "lon"
+              },
+              "y": {
+                "node": "lat"
+              },
+              "crs": {
+                "proj:code": "EPSG:4326"
+              }
+            }
           }
         },
         {
-          "name": "Temporal scale based on the 'noleap' model calendar.",
+          "name": "Temporal scale based on the '360_day' model calendar.",
           "axes": [
             {
               "name": "time",
@@ -66,32 +70,14 @@
               "coordinates": [
                 {
                   "time": {
-                    "reference": "days since 1850-01-01",
-                    "calendar": "noleap"
+                    "reference": "days since 1949-12-01",
+                    "calendar": "360_day"
                   },
                   "values": {
-                    "regular": [27895.5, 1]
+                    "regular": [20190.5, 1]
                   },
                   "boundaries": {
                     "regular": [-0.5, 0.5]
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "Height above surface for standard meteorological measurements.",
-          "axes": [
-            {
-              "name": "height",
-              "abbreviation": "Z",
-              "direction": "up",
-              "coordinates": [
-                {
-                  "unit": "meter",
-                  "values": {
-                    "explicit": [2]
                   }
                 }
               ]

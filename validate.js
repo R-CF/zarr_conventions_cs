@@ -22,6 +22,7 @@ ajv7.addSchema(proj);
 // Fetch and add external schemas by their URL
 const externalSchemas = [
   "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/main/schema.json",
+  "https://raw.githubusercontent.com/R-CF/zarr_convention_geolocation/main/schema.json",
   "https://raw.githubusercontent.com/clbarnes/zarr-convention-uom/refs/tags/v1/schema.json"
 ];
 

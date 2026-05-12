@@ -17,11 +17,11 @@
     "cs": {
       "crs": [
         {
-          "node": "/",
+          "node": "..",
           "attribute": "/attributes/crs/WGS84"
         },
         {
-          "node": "/",
+          "node": "..",
           "attribute": "/attributes/crs/standard_calendar"
         }
       ]
