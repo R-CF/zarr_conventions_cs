@@ -12,6 +12,10 @@
       {
         "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_geolocation/main/schema.json",
         "name": "geolocation"
+      },
+      {
+        "schema_url": "https://raw.githubusercontent.com/zarr-conventions/geo-proj/main/schema.json",
+        "name": "proj"
       }
     ],
     "cs": {

@@ -24,7 +24,7 @@ This convention implements a **coordinate set** for Zarr arrays based on the OGC
 
 The top-level property in this convention is `cs` and is usually placed at the root `attributes` level of the Zarr array metadata. The `cs` property has an array of `crs` objects that jointly describe the coordinate set. CRSs may be shared between multiple arrays in a single Zarr store. This is achieved by placing an list of `crs` objects in a group and referencing that group and its `crs` attribute from a Zarr array.
 
-This convention uses the [`proj:` convention](https://github.com/zarr-conventions/geo-proj) to describe the reference frame linking the coordinate system to Earth. See the Examples section on how these two conventions can be combined.
+This convention uses the [`proj` convention](https://github.com/zarr-conventions/geo-proj) to describe the reference frame linking the coordinate system to Earth. See the Examples section on how these two conventions can be combined.
 
 ### Compositing a coordinate set
 
@@ -53,7 +53,7 @@ The objects that make up this convention are in part implemented using the [CF M
 This convention uses Zarr-specific and/or industry-standard alternatives for several constructs from the CF Metadata Conventions:
 
 - [Reduction of Dataset Size](https://cfconventions.org/cf-conventions/cf-conventions.html#reduction-of-dataset-size) is largely specific to the netCDF format. In Zarr the compression codecs will be used.
-- [Horizontal Coordinate Reference Systems, Grid Mappings, and Projections](https://cfconventions.org/cf-conventions/cf-conventions.html#grid-mappings-and-projections) uses an obsolete and incomplete definition of CRSs. The `proj:` convention is used in this convention to record the CRS using the OGC [Well-known text representation of coordinate reference systems](https://docs.ogc.org/is/18-010r11/18-010r11.pdf).
+- [Horizontal Coordinate Reference Systems, Grid Mappings, and Projections](https://cfconventions.org/cf-conventions/cf-conventions.html#grid-mappings-and-projections) uses an obsolete and incomplete definition of CRSs. The `proj` convention is used in this convention to record the CRS using the OGC [Well-known text representation of coordinate reference systems](https://docs.ogc.org/is/18-010r11/18-010r11.pdf).
 
 Some other parts of the CF Metadata Conventions can be addressed with other Zarr conventions, such as [Ancillary Data](https://cfconventions.org/cf-conventions/cf-conventions.html#ancillary-data) and [External Variables](https://cfconventions.org/cf-conventions/cf-conventions.html#external-variables) that can be encoded using the [ref](https://github.com/R-CF/zarr_convention_ref) convention also used by this convention.
 
@@ -111,7 +111,7 @@ The `cs` property is placed at the root `attributes` level of an array. It is an
 | ---------- | --------------------------- | --------------------- | -------- |
 | name       | string                      | Name of the CS        | No       |
 | crs        | [[CRS object](#crs-object)] | Array of `crs` objects | Yes     |
-| id         | `proj:` object              | Unique identifier of the CS | No |
+| id         | `proj` object               | Unique identifier of the CS | No |
 
 Irrespective of the order in which `crs` objects are defined, the composite set of axes resulting from combining the objects in the `crs` array MUST be interpreted in the order in which the axis names appear in the `dimension_names` attribute of the array to which the composited CRS is applied for addressing elements in the Zarr array. Axes of length 1 that are not reflected in the array `dimension_names` attribute may be managed in an application-specific manner.
 
@@ -122,7 +122,7 @@ The `name` field is a descriptive name of the coordinate set. The name MUST foll
 An array of `crs` objects or references to a `crs` object in a group elsewhere in the Zarr store. 
 
 #### id
-The unique identifier of the composite CRS, encoded using the `proj:` convention. This field SHOULD be included if the coordinate set is composited from multiple `crs` objects for the spatio-temporal domain. If this field is provided it overrides any CRS identifiers from CRSs in the `crs` array.
+The unique identifier of the composite CRS, encoded using the `proj` convention. This field SHOULD be included if the coordinate set is composited from multiple `crs` objects for the spatio-temporal domain. If this field is provided it overrides any CRS identifiers from CRSs in the `crs` array.
 
 ### CRS object
 The `crs` object defines the coordinate system of a single CRS. A Zarr array may have multiple CRSs to fully encompass its coordinate system.
@@ -141,7 +141,7 @@ The `name` field is a descriptive name of the coordinate reference system. If gi
 An array of `axis` objects. 
 
 #### id
-The unique identifier of the CRS, encoded using the `proj:` convention. This field SHOULD be included if the `cs` object does not include an `id` field and the identifier for this CRS is known. If the `id` field of the `cs` object is included, this identifier SHOULD be omitted.
+The unique identifier of the CRS, encoded using the `proj` convention. This field SHOULD be included if the `cs` object does not include an `id` field and the identifier for this CRS is known. If the `id` field of the `cs` object is included, this identifier SHOULD be omitted.
 
 If the `geolocation` field is included, this `id` is typically not known and should thus be excluded. If the `id` is known and specified, it takes precedence over any `crs` field in the `geolocation` object.
 
