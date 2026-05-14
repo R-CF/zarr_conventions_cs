@@ -42,9 +42,9 @@ Implementations should make an effort to distinguish between first-class arrays 
 
 ### CF Metadata Conventions
 
-The objects that make up this convention are in part implemented using the [CF Metadata Conventions](https://cfconventions.org/cf-conventions/cf-conventions.html) for coordinate types and their associated objects. In practice this means that netCDF files that apply the CF Metadata Conventions may be stored in Zarr using this convention without loss of information. The following features of the CF Metadata Conventions are supported by this convention:
+The objects that make up this convention are in part implemented using the [CF Metadata Conventions](https://cfconventions.org/cf-conventions/cf-conventions.html) for coordinate types and their associated objects. In practice this means that many common data holdings that apply the CF Metadata Conventions may be stored in Zarr using this convention without loss of information. The following features of the CF Metadata Conventions are supported by this convention:
 
-- [Coordinate types](https://cfconventions.org/cf-conventions/cf-conventions.html#coordinate-types) are largely supported, with minor differences. Latitude and longitude coordinates use other units (`"degrees_north"` and `"degrees_east"` are not true units and they are not used in this convention) and are identified by axis abbreviation and direction. Parametric vertical coordinates are not yet supported. Time coordinates are supported for all calendars except explicitly defined calendars. A discrete axis is an ordinal axis in this convention.
+- [Coordinate types](https://cfconventions.org/cf-conventions/cf-conventions.html#coordinate-types) are supported, with minor differences. Latitude and longitude coordinates use other units (`"degrees_north"` and `"degrees_east"` are not true units and they are not used in this convention) and are identified by axis abbreviation and direction. Parametric vertical coordinates are fully supported but use different attributes. Time coordinates are supported for all calendars except explicitly defined calendars. A discrete axis is an ordinal axis in this convention.
 - [Scalar coordinate variables](https://cfconventions.org/cf-conventions/cf-conventions.html#scalar-coordinate-variables) are represented as regular axes of length 1 and may be of any supported type. These do not necessarily have to be present in the `shape` and `dimension_names` attributes of the Zarr array.
 - [Bounds for one-dimensional coordinate variables](https://cfconventions.org/cf-conventions/cf-conventions.html#bounds-one-d) are an attribute of the coordinates of each axis.
 - [String-valued auxiliary coordinate variables](https://cfconventions.org/cf-conventions/cf-conventions.html#labels) are included in the definition of an axis, which may have multiple sets of coordinates. This is particularly useful for ordinal axes but it may be applied to any type of axis.
@@ -96,9 +96,9 @@ This convention can be used with these parts of the Zarr hierarchy:
 ## Group properties
 A Zarr group can declare any number of `crs` objects. These will be referenced by key by Zarr arrays elsewhere in the store. The `crs` property is placed at the root of the group `attributes`.
 
-| Field Name | Type   | Description         | Required |
-| ---------- | ------ | ------------------- | -------- |
-| crs        | object | Keyed `crs` object. | No       |
+| Field Name | Type   | Description        | Required |
+| ---------- | ------ | ------------------ | -------- |
+| crs        | object | Keyed `crs` object | No       |
 
 This field holds any number of [CRS objects](#crs-object) as a key-value pair. The key is not necessarily identical to the name of the `crs`. See the "Group" definition of the "CRU monthly data" example, below, for its formulation.
 
@@ -109,9 +109,9 @@ The `cs` property is placed at the root `attributes` level of an array. It is an
 
 | Field Name | Type                        | Description           | Required |
 | ---------- | --------------------------- | --------------------- | -------- |
-| name       | string                      | Name of the CS.       | No       |
-| crs        | [[CRS object](#crs-object)] | Array of `crs` objects. | Yes    |
-| id         | `proj:` object              | Unique identifier of the CS. | No |
+| name       | string                      | Name of the CS        | No       |
+| crs        | [[CRS object](#crs-object)] | Array of `crs` objects | Yes     |
+| id         | `proj:` object              | Unique identifier of the CS | No |
 
 Irrespective of the order in which `crs` objects are defined, the composite set of axes resulting from combining the objects in the `crs` array MUST be interpreted in the order in which the axis names appear in the `dimension_names` attribute of the array to which the composited CRS is applied for addressing elements in the Zarr array. Axes of length 1 that are not reflected in the array `dimension_names` attribute may be managed in an application-specific manner.
 
@@ -175,15 +175,16 @@ An axis may have multiple sets of coordinates. A typical scenario would be an ax
 
 If this field is omitted, the axis is of ordinal type, i.e. a sequence `0..n-1` with `n` being the length of the dimension of the shape that this axis refers to. This field MUST be specified for all other types of axes.
 
-| Field Name   | Type     | Description                    | Required    |
-| ------------ | ---------| ------------------------------ | ----------- |
-| name         | string   | Name of the set of coordinates | No         |
-| direction    | string   | Direction of the coordinates   | Conditional |
-| unit         | [Unit object](#unit-object) | Unit-of-measure of the coordinates | Conditional |
-| time         | [Time object](#time-object) | Time definition for temporal coordinates | Conditional |
-| values       | [Values object](#values-object) | The values of the coordinates | Yes        |
-| boundaries   | [Boundaries object](#boundaries-object) | Boundary values of the coordinates | Conditional |
-| attributes   | object   | Any other attributes of the coordinates | No |
+| Field Name | Type     | Description                    | Required    |
+| ---------- | ---------| ------------------------------ | ----------- |
+| name       | string   | Name of the set of coordinates | No         |
+| direction  | string   | Direction of the coordinates   | Conditional |
+| unit       | [Unit object](#unit-object) | Unit-of-measure of the coordinates | Conditional |
+| time       | [Time object](#time-object) | Time definition for temporal coordinates | Conditional |
+| values     | [Values object](#values-object) | The values of the coordinates | Yes        |
+| boundaries | [Boundaries object](#boundaries-object) | Boundary values of the coordinates | Conditional |
+| parametric | [Parametric object](#parametric-object) | Definition and terms of a parametric coordinate set | No |
+| attributes | object   | Any other attributes of the coordinates | No |
 
 #### name
 A short name that describes this set of coordinates. The name MAY NOT be used by any other set of coordinates for this axis.
@@ -213,10 +214,10 @@ When the unit is conventional and commonly understood a simple string value suff
 ### Time object
 Temporal coordinates are specified using a reference date-time and a calendar, using the specification of the [CF Metadata Conventions](https://cfconventions.org/cf-conventions/cf-conventions.html#time-coordinate). It MUST be specified for an axis representing the temporal domain, it MAY NOT be specified otherwise.
 
-| Field Name | Type   | Description                                           | Required  |
-| ---------- | -------| ----------------------------------------------------- | --------- |
-| reference  | string | Reference date-time and unit from which time coordinates are calculated. | Yes |
-| calendar   | string | Name of a calendar. | No |
+| Field Name | Type   | Description                                | Required  |
+| ---------- | -------| ------------------------------------------ | --------- |
+| reference  | string | Reference date-time and unit from which time coordinates are calculated | Yes |
+| calendar   | string | Name of a calendar                         | No        |
 
 #### reference
 The reference date-time from which time coordinates are calculated. This takes the form of `"<time unit> since <timestamp>"`, e.g. `"days since 1949-12-01T12:00:00"`.
@@ -224,14 +225,17 @@ The reference date-time from which time coordinates are calculated. This takes t
 #### calendar
 A calendar to use for the calculations. This can be a common calendar or a model calendar as used in climate projection data sets. This field is recommended but it may be omitted, in which case the calendar will be application-defined, typically `"standard"` or `"proleptic_gregorian"`.
 
+#### values
+The values of the coordinates are specified using a `values` object. The values must form a 1-dimensional array.
+
 ### Values object
 The values the coordinates can be represented in different ways. One, and only one, of the below fields MUST be specified.
 
-| Field Name | Type     | Description                                                | Required    |
-| ---------- | ---------| ---------------------------------------------------------- | ----------- |
-| regular    | [number] | Initial coordinate value and increment.                    | Conditional |
-| external   | ref      | Reference to a 1-dimensional array with coordinate values. | Conditional |
-| explicit   | []       | JSON array of coordinate values.                           | Conditional |
+| Field Name | Type     | Description                                           | Required    |
+| ---------- | ---------| ----------------------------------------------------- | ----------- |
+| regular    | [number] | Initial coordinate value and increment                | Conditional |
+| external   | ref      | Reference to an external array with coordinate values | Conditional |
+| explicit   | []       | JSON array of coordinate values                       | Conditional |
 
 #### regular
 This method is preferred when the numeric coordinate values are equally spaced and thus monotonically increasing or decreasing. The JSON array consists of the coordinate of the first element along the dimension (at shape index `0`) of the axis, followed by the increment to make subsequent coordinate values, possibly negative. The increment may not be 0.
@@ -258,6 +262,29 @@ When the extent around coordinate values is constant over the coordinate space o
 
 #### external
 When the extent around coordinate values is irregular, the boundary values should be given in a Zarr array external to this array or group. This field contains a reference with the path to a 2-dimensional array with boundary values, with the first dimension having a length of 2 for the lower and upper boundary values, respectively, and the second dimension having a length equal to the dimension of the shape that the axis refers to.
+
+### Parametric object
+
+Coordinates belonging to an axis may be defined in parametric terms. This usually applies to a vertically-oriented axis. Typical applications of vertical parametric coordinates are in coastal waters with a time-dependent tidal effect, and near-surface atmospheric dynamics in the presence of pronounced topography. The parametric coordinates are typically 4-dimensional (latitude-longitude-height-time) and thus very voluminous; the terms used in the derivation of the parametric coordinates are of lower rank and thus much more economical in storage and transmittal.
+
+For the two application areas of oceanograhpy and atmospheric dynamics, several standard formulas have been defined; an overview of the structure is given in the CF Metadata Conventions sections on [parametric vertical coordinates](https://cfconventions.org/cf-conventions/cf-conventions.html#parametric-vertical-coordinate), with details on the formulas and their _terms_ provided in [Appendix D](https://cfconventions.org/cf-conventions/cf-conventions.html#parametric-v-coord). This convention does not follow the attribute arrangement of the CF Metadata Conventions for parametric vertical coordinates.
+
+In this convention, the _parametric term_ is the principal object whose coordinates are given in the `"values"` field (similar to the CF arrangement). The formula _terms_ are given in this object.
+
+The calculation of the parametric coordinate values is done at the application level, applying the formulas given in Appendix D of the CF Metadata Conventions.
+
+| Field Name | Type   | Description                           | Required |
+| ---------- | ------ | ------------------------------------- | -------- |
+| formula    | string | The name of the formulation, the `"standard_name"` used in CF | Yes |
+| terms      | object | Keyed [Values object](#values-object) | Yes      |
+
+#### formula
+The `formula` field records the name of the formula. It SHOULD be identical to one of the "standard_names" defined in the CF Metadata Conventions for vertical parametric coordinates; otherwise it MUST be a URI to a human-readable description of the formulation.
+
+#### terms
+The `terms` field is a keyed JSON object, where the key corresponds to one of the formula _terms_ as defined in the CF Metadata Conventions (the key-value association is equivalent in information content to the CF "formula_terms" attribute), and the value is a `values` object.
+
+This field MUST have as many `values` objects as the `formula` field implies.
 
 ## Examples
 The below examples focus on the specification of the `cs` attribute for various types of files - other parts of the Zarr array specification, including general attributes, are omitted for brevity.

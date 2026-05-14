@@ -214,6 +214,9 @@
         },
         "boundaries": {
           "$ref": "#/$defs/boundaries"
+        },
+        "parametric": {
+          "$ref": "#/$defs/parametric"
         }
       },
       "required": ["values"],
@@ -285,6 +288,24 @@
         { "required": ["external"] }
       ],
       "additionalProperties": true
+    },
+    "parametric": {
+      "type": "object",
+      "description": "Formula and terms for parametric coordinates",
+      "properties": {
+        "formula": {
+          "type": "string"
+        },
+        "crs": {
+          "type": "object",
+          "description": "Keyed values objects, keyed by name of the formula term",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/values"
+          }
+        }
+      },
+      "required": ["formula", "terms"]
     }
   }
 }
