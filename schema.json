@@ -226,14 +226,17 @@
       "type": "object",
       "description": "The time definition of a set of coordinates.",
       "properties": {
-        "reference": {
+        "unit": {
+          "type": "string"
+        },
+        "epoch": {
           "type": "string"
         },
         "calendar": {
           "type": "string"
         }
       },
-      "required": ["reference"],
+      "required": ["unit", "epoch"],
       "additionalProperties": true
     },
     "values": {

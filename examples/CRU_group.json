@@ -59,7 +59,8 @@
               {
                 "direction": "future",
                 "time": {
-                  "reference": "days since 1900-01-01",
+                    "unit": "day",
+                    "epoch": "1900-01-01",
                   "calendar": "standard"
                 },
                 "values": {

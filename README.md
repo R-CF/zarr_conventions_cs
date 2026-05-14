@@ -212,15 +212,19 @@ The unit-of-measure of coordinate values can be expressed as a simple string or 
 When the unit is conventional and commonly understood a simple string value suffices, such as `"m"` or `"kg m-2 s-1"`. If the unit is uncommon or more complex, use of the `uom` convention is recommended.
 
 ### Time object
-Temporal coordinates are specified using a reference date-time and a calendar, using the specification of the [CF Metadata Conventions](https://cfconventions.org/cf-conventions/cf-conventions.html#time-coordinate). It MUST be specified for an axis representing the temporal domain, it MAY NOT be specified otherwise.
+Temporal coordinates are specified using a time unit, an epoch and a calendar. It MUST be specified for an axis representing the temporal domain, it MAY NOT be specified otherwise.
 
-| Field Name | Type   | Description                                | Required  |
-| ---------- | -------| ------------------------------------------ | --------- |
-| reference  | string | Reference date-time and unit from which time coordinates are calculated | Yes |
-| calendar   | string | Name of a calendar                         | No        |
+| Field Name | Type   | Description                         | Required |
+| ---------- | -------| ----------------------------------- | -------- |
+| unit       | string | Time unit                           | Yes      |
+| epoch      | string | The epoch for the time calculations | Yes      |
+| calendar   | string | Name of a calendar                  | No       |
 
-#### reference
-The reference date-time from which time coordinates are calculated. This takes the form of `"<time unit> since <timestamp>"`, e.g. `"days since 1949-12-01T12:00:00"`.
+#### unit
+The time unit: "second", "minute", "hour", "day", or "year", or a one-letter abbreviation thereof. The "second" unit may use a sub-multiple prefix, such as "ns" for nano-second. Following the CF Metadata Conventions, it is recommended not to use the unit "month". The unit "year", possibly with a multiple prefix such as "ky" for "kilo-year", should only be used for coordinates that span very long time scales, such as over paleological periods.
+
+#### epoch
+An instant in time against which time coordinates are calculated. This should be a string value in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format, with an allowance for instants that do not exist in the Gregorian calendar (such as "2026-02-30" in a "360_day" calendar). At the epoch instant, the stored value is 0.
 
 #### calendar
 A calendar to use for the calculations. This can be a common calendar or a model calendar as used in climate projection data sets. This field is recommended but it may be omitted, in which case the calendar will be application-defined, typically `"standard"` or `"proleptic_gregorian"`.

@@ -63,7 +63,8 @@
                 {
                   "direction": "future",
                   "time": {
-                    "reference": "days since 1850-01-01",
+                    "unit": "day",
+                    "epoch": "1850-01-01",
                     "calendar": "noleap"
                   },
                   "values": {

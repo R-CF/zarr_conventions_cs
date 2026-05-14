@@ -70,7 +70,8 @@
                 {
                   "direction": "future",
                   "time": {
-                    "reference": "days since 1949-12-01",
+                    "unit": "day",
+                    "epoch": "1949-12-01",
                     "calendar": "360_day"
                   },
                   "values": {

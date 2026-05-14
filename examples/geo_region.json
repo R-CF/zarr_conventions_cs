@@ -35,7 +35,8 @@
                 {
                   "direction": "future",
                   "time": {
-                    "reference": "hours since 1800-01-01",
+                    "unit": "hour",
+                    "epoch": "1800-01-01",
                     "calendar": "standard"
                   },
                   "values": {
