@@ -248,7 +248,7 @@ This method is preferred when the numeric coordinate values are equally spaced a
 When coordinate values are irregular or for long string-valued axes, the coordinate values should be supplied in a 1-dimensional array elsewhere in the Zarr store. This parameter gives the reference to the array with the coordinate values. That array MUST have one dimension in its `shape`, whose value is identical to the dimension in the `shape` of this array that the axis refers to.
 
 #### explicit
-For short axes (max. 20 ~ 25 elements) and single-valued axes this parameter supplies the coordinate values. For axes having a greater length use of the `"external"` object is recommended.
+For short axes and single-valued axes this parameter supplies the coordinate values. For axes having a greater length use of the `"external"` object is recommended.
 
 ### Boundaries object
 
