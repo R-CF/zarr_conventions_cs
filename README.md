@@ -10,7 +10,7 @@
 
 ## Description
 
-Zarr arrays have a mandatory `shape` attribute with an element for each array dimension and the element value giving the length of the dimension. This establishes an indexing space with which elements in the array can be addressed. Zarr is agnostic with regards to the semantics of dimensions and shape elements. This convention presents a schema to attach coordinate values to the dimensions of the array shape and its elements. In common language, this is usually referred to as a coordinate system.
+Zarr arrays have a mandatory `shape` attribute with an element for each array dimension and the element value giving the length of the dimension. This establishes an indexing space with which elements in the array can be addressed. Zarr is agnostic with regards to the semantics of dimensions and shape elements. This convention presents a schema to attach coordinate values to the dimensions of the array shape and its elements. In common language this is usually referred to as a coordinate system.
 
 This convention implements the relevant parts of the OGC standard [Referencing by Coordinates](http://www.opengis.net/doc/AS/topic-2/5.0.1), but applied to the Zarr specification and extended to dimensions beyond the spatio-temporal domain. The central concept is the **coordinate reference system** (CRS), which links a **coordinate system** to a **reference frame** (formerly named a "datum", which registers the coordinate system to some location on Earth). The **coordinate system** has axes and properties such as units-of-measure and direction. These concepts are all still "abstract": they define a model to describe the locations of points on Earth, but the coordinates of the points themselves are not there. A **coordinate set** is a materialization of a CRS: where the CRS is a conceptual model, the **coordinate set** is the _specific_ set of axes and their coordinate values that apply to a _specific_ Zarr array. More formally (section 7.1 of the OGC standard):
 
@@ -44,7 +44,7 @@ Implementations should make an effort to distinguish between first-class arrays 
 
 The objects that make up this convention are in part implemented using the [CF Metadata Conventions](https://cfconventions.org/cf-conventions/cf-conventions.html) for coordinate types and their associated objects. In practice this means that many common data holdings that apply the CF Metadata Conventions may be stored in Zarr using this convention without loss of information. The following features of the CF Metadata Conventions are supported by this convention:
 
-- [Coordinate types](https://cfconventions.org/cf-conventions/cf-conventions.html#coordinate-types) are supported, with minor differences. Latitude and longitude coordinates use other units (`"degrees_north"` and `"degrees_east"` are not true units and they are not used in this convention) and are identified by axis abbreviation and direction. Parametric vertical coordinates are fully supported but use different attributes. Time coordinates are supported for all calendars except explicitly defined calendars. A discrete axis is an ordinal axis in this convention.
+- [Coordinate types](https://cfconventions.org/cf-conventions/cf-conventions.html#coordinate-types) are supported, with minor differences. Latitude and longitude coordinates use other units (`"degrees_north"` and `"degrees_east"` are not true units and they are not used in this convention) and are identified by axis abbreviation and direction. Parametric vertical coordinates are fully supported but use different attributes. Time coordinates are supported for all calendars except explicitly defined calendars, using different attributes. A discrete axis is an ordinal axis in this convention.
 - [Scalar coordinate variables](https://cfconventions.org/cf-conventions/cf-conventions.html#scalar-coordinate-variables) are represented as regular axes of length 1 and may be of any supported type. These do not necessarily have to be present in the `shape` and `dimension_names` attributes of the Zarr array.
 - [Bounds for one-dimensional coordinate variables](https://cfconventions.org/cf-conventions/cf-conventions.html#bounds-one-d) are an attribute of the coordinates of each axis.
 - [String-valued auxiliary coordinate variables](https://cfconventions.org/cf-conventions/cf-conventions.html#labels) are included in the definition of an axis, which may have multiple sets of coordinates. This is particularly useful for ordinal axes but it may be applied to any type of axis.
@@ -57,7 +57,7 @@ This convention uses Zarr-specific and/or industry-standard alternatives for sev
 
 Some other parts of the CF Metadata Conventions can be addressed with other Zarr conventions, such as [Ancillary Data](https://cfconventions.org/cf-conventions/cf-conventions.html#ancillary-data) and [External Variables](https://cfconventions.org/cf-conventions/cf-conventions.html#external-variables) that can be encoded using the [ref](https://github.com/R-CF/zarr_convention_ref) convention also used by this convention.
 
-This convention is not a Zarr implementation of the full CF Metadata Conventions and many features are not supported. It is the responsibility of the user of this convention to ensure that other relevant parts of a CF-compatible netCDF are adequately addressed, such as user attributes and any other features present in the netCDF file.
+This convention is not a Zarr implementation of the full CF Metadata Conventions and many features are not supported. This convention preserves the _semantics_ of the CF Metadata Conventions (with minor differences), but it uses a very different _encoding_ for efficient storage of CF-compliant data in Zarr, compared to netCDF. It is the responsibility of the user of this convention to ensure that other relevant parts of a CF-compatible data set are adequately addressed, such as user attributes and any other features present in the data set.
 
 ## Motivation
 
@@ -81,7 +81,7 @@ The convention must be registered in the `zarr_conventions` attribute of the gro
       "spec_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/main/README.md",
       "uuid": "e4dbf0b7-7a00-4ce6-b23e-484292014ab4",
       "name": "cs",
-      "description": "Coordinate system for arrays"
+      "description": "Coordinate set for n-dimensional arrays"
     }
   ]
 }
@@ -206,6 +206,9 @@ _\* Depending on which way increasing coordinate values go. For instance, pressu
 
 In image data with a typical coordinate system made up of the (X, Y) coordinate values of the upper-left corner and a grid cell size, the direction for the Y values will still be "north" but the `"increment"` value in the `"values"` field will be negative.
 
+#### values
+The values of the coordinates are specified using a `values` object. The values must form a 1-dimensional array.
+
 ### Unit object
 The unit-of-measure of coordinate values can be expressed as a simple string or using the [`uom` convention](https://github.com/clbarnes/zarr-convention-uom). It MUST be specified for numeric coordinate values, it MAY NOT be specified for temporal or string-valued coordinates or ordinal axes.
 
@@ -228,9 +231,6 @@ An instant in time against which time coordinates are calculated. This should be
 
 #### calendar
 A calendar to use for the calculations. This can be a common calendar or a model calendar as used in climate projection data sets. This field is recommended but it may be omitted, in which case the calendar will be application-defined, typically `"standard"` or `"proleptic_gregorian"`.
-
-#### values
-The values of the coordinates are specified using a `values` object. The values must form a 1-dimensional array.
 
 ### Values object
 The values the coordinates can be represented in different ways. One, and only one, of the below fields MUST be specified.
@@ -353,7 +353,8 @@ A typical CMIP6 data set contains a single data variable. The coordinate set can
               "coordinates": [
                 {
                   "time": {
-                    "reference": "days since 1850-01-01",
+                    "unit": "days",
+                    "epoch": "1850-01-01",
                     "calendar": "noleap"
                   },
                   "values": { "regular": [27895.5, 1] },
@@ -448,7 +449,8 @@ As the previous example, less the single-valued axis, but now the temporal dimen
               "coordinates": [
                 {
                   "time": {
-                    "reference": "days since 1850-01-01",
+                    "unit": "days",
+                    "epoch": "1850-01-01",
                     "calendar": "noleap"
                   },
                   "values": {
@@ -528,7 +530,8 @@ The axes for the coordinate set are described in this group. The "standard_calen
             "coordinates": [
               {
                 "time": {
-                  "reference": "days since 1900-01-01",
+                  "unit": "days",
+                  "epoch": "1900-01-01",
                   "calendar": "standard"
                 },
                 "values": {
@@ -658,7 +661,8 @@ CORDEX regionally downscaled climate projection data typically uses a so-called 
               "coordinates": [
                 {
                   "time": {
-                    "reference": "days since 1949-12-01",
+                    "unit": "days",
+                    "epoch": "1949-12-01",
                     "calendar": "360_day"
                   },
                   "values": {
@@ -721,7 +725,8 @@ A climatological dataset by geographic regions, summarised to a single date-time
               "coordinates": [
                 {
                   "time": {
-                    "reference": "hours since 1800-01-01",
+                    "unit": "hours",
+                    "epoch": "1800-01-01",
                     "calendar": "standard"
                   },
                   "values": { "explicit": [1678608] },
