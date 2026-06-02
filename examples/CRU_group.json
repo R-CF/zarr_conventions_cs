@@ -18,9 +18,8 @@
     ],
     "crs": {
       "WGS84": {
-        "axes": [
-          {
-            "name": "lon",
+        "axes": {
+          "lon": {
             "abbreviation": "X",
             "coordinates": [
               {
@@ -32,8 +31,7 @@
               }
             ]
           },
-          {
-            "name": "lat",
+          "lat": {
             "abbreviation": "Y",
             "coordinates": [
               {
@@ -45,15 +43,14 @@
               }
             ]
           }
-        ],
+        },
         "id": {
           "proj:code": "EPSG:4326"
         }
       },
       "standard_calendar": {
-        "axes": [
-          {
-            "name": "time",
+        "axes": {
+          "time": {
             "abbreviation": "T",
             "coordinates": [
               {
@@ -65,13 +62,15 @@
                 },
                 "values": {
                   "external": {
-                    "node": "time"
+                    "ref": {
+                      "node": "../time"
+                    }
                   }
                 }
               }
             ]
           }
-        ]
+        }
       }
     }
   }

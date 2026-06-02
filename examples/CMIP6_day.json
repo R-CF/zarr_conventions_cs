@@ -18,9 +18,8 @@
       "crs": [
         {
           "name": "WGS84",
-          "axes": [
-            {
-              "name": "lon",
+          "axes": {
+            "lon": {
               "abbreviation": "X",
               "coordinates": [
                 {
@@ -35,8 +34,7 @@
                 }
               ]
             },
-            {
-              "name": "lat",
+            "lat": {
               "abbreviation": "Y",
               "coordinates": [
                 {
@@ -51,16 +49,15 @@
                 }
               ]
             }
-          ],
+          },
           "id": {
             "proj:code": "EPSG:4326"
           }
         },
         {
           "name": "Temporal scale based on the 'noleap' model calendar.",
-          "axes": [
-            {
-              "name": "time",
+          "axes": {
+            "time": {
               "abbreviation": "T",
               "coordinates": [
                 {
@@ -79,13 +76,12 @@
                 }
               ]
             }
-          ]
+          }
         },
         {
           "name": "Height above surface for standard meteorological measurements.",
-          "axes": [
-            {
-              "name": "height",
+          "axes": {
+            "height": {
               "abbreviation": "Z",
               "coordinates": [
                 {
@@ -97,7 +93,7 @@
                 }
               ]
             }
-          ]
+          }
         }
       ]
     }

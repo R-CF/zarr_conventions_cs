@@ -1,0 +1,61 @@
+{
+  "zarr_format": 3,
+  "node_type": "array",
+  "shape": [25000, 16000],
+  "dimension_names": ["azimuth_time", "ground_range"],
+  "attributes": {
+    "zarr_conventions": [
+      { "name": "cs",
+        "uuid": "e4dbf0b7-7a00-4ce6-b23e-484292014ab4"
+      },
+      { "name": "geolocation",
+        "uuid": "bb9ee930-8c60-4c47-ad6b-8daa558987ed"
+      }
+    ],
+    "cs": {
+      "name": "Sentinel-1 GRD native geometry",
+      "crs": [
+        {
+          "name": "Zero-Doppler azimuth time",
+          "axes": {
+            "azimuth_time": {
+              "abbreviation": "T",
+              "direction": "future",
+              "coordinates": [{
+                "time": {
+                  "unit": "ms",
+                  "epoch": "2024-03-15T06:12:00Z",
+                  "calendar": "standard"
+                },
+                "values": { "regular": [0.0, 2.055] },
+                "boundaries": { "regular": [-1.0275, 1.0275] }
+              }]
+            }
+          }
+        },
+        {
+          "name": "Ground range distance from sub-satellite track",
+          "axes": {
+            "ground_range": {
+              "direction": "away",
+              "coordinates": [{
+                "unit": "m",
+                "values": { "regular": [0.0, 10.0] },
+                "boundaries": { "regular": [-5.0, 5.0] }
+              }]
+            }
+          },
+          "geolocation": {
+            "geodetic": {
+              "x": { "node": "../lon" },
+              "y": { "node": "../lat" },
+              "crs": {
+                "proj:code": "EPSG:4326"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -13,9 +13,8 @@
     "cs": {
       "crs": [
         {
-          "axes": [
-            {
-              "name": "geo_region",
+          "axes": {
+            "geo_region": {
               "coordinates": [
                 {
                   "values": {
@@ -24,12 +23,11 @@
                 }
               ]
             }
-          ]
+          }
         },
         {
-          "axes": [
-            {
-              "name": "time",
+          "axes": {
+            "time": {
               "abbreviation": "T",
               "coordinates": [
                 {
@@ -48,7 +46,7 @@
                 }
               ]
             }
-          ]
+          }
         }
       ]
     }

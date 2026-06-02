@@ -18,9 +18,8 @@
       "crs": [
         {
           "name": "WGS84",
-          "axes": [
-            {
-              "name": "lon",
+          "axes": {
+            "lon": {
               "abbreviation": "X",
               "coordinates": [
                 {
@@ -35,8 +34,7 @@
                 }
               ]
             },
-            {
-              "name": "lat",
+            "lat": {
               "abbreviation": "Y",
               "coordinates": [
                 {
@@ -51,13 +49,12 @@
                 }
               ]
             }
-          ]
+          }
         },
         {
           "name": "Temporal scale based on the 'noleap' model calendar.",
-          "axes": [
-            {
-              "name": "time",
+          "axes": {
+            "time": {
               "abbreviation": "T",
               "coordinates": [
                 {
@@ -69,18 +66,22 @@
                   },
                   "values": {
                     "external": {
-                      "node": "time"
+                      "ref": {
+                        "node": "../time"
+                      }
                     }
                   },
                   "boundaries": {
                     "external": {
-                      "node": "time_bnds"
+                      "ref": {
+                        "node": "../time_bnds"
+                      }
                     }
                   }
                 }
               ]
             }
-          ]
+          }
         }
       ]
     }

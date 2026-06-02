@@ -22,9 +22,8 @@
       "crs": [
         {
           "name": "rotated pole grid for CORDEX EUR-11 domain",
-          "axes": [
-            {
-              "name": "rlon",
+          "axes": {
+            "rlon": {
               "abbreviation": "X",
               "coordinates": [
                 {
@@ -36,8 +35,7 @@
                 }
               ]
             },
-            {
-              "name": "rlat",
+            "rlat": {
               "abbreviation": "Y",
               "coordinates": [
                 {
@@ -49,14 +47,14 @@
                 }
               ]
             }
-          ],
+          },
           "geolocation": {
             "geodetic": {
               "x": {
-                "node": "lon"
+                "node": "../lon"
               },
               "y": {
-                "node": "lat"
+                "node": "../lat"
               },
               "crs": {
                 "proj:code": "EPSG:4326"
@@ -66,9 +64,8 @@
         },
         {
           "name": "Temporal scale based on the '360_day' model calendar.",
-          "axes": [
-            {
-              "name": "time",
+          "axes": {
+            "time": {
               "abbreviation": "T",
               "coordinates": [
                 {
@@ -87,7 +84,7 @@
                 }
               ]
             }
-          ]
+          }
         }
       ]
     }

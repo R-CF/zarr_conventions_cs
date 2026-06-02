@@ -151,8 +151,10 @@
           "description": "Descriptive name for the coordinate reference system."
         },
         "axes": {
-          "type": "array",
-          "items": {
+          "type": "object",
+          "description": "Keyed axis objects, keyed by dimension name",
+          "minProperties": 1,
+          "additionalProperties": {
             "$ref": "#/$defs/axis"
           }
         },
@@ -170,10 +172,6 @@
       "type": "object",
       "description": "Properties of an individual axis.",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "Name of the axis. Required."
-        },
         "abbreviation": {
           "type": "string",
           "description": "Abbreviation of the axis, such as \"X\" or \"Y\"."
@@ -189,7 +187,6 @@
           }
         }
       },
-      "required": ["name"],
       "additionalProperties": true
     },
     "coordinates": {
@@ -253,7 +250,13 @@
           "maxItems": 2
         },
         "external": {
-          "$ref": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/main/schema.json#/$defs/ref",
+          "type": "object",
+          "properties": {
+            "ref": {
+              "$ref": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/main/schema.json#/$defs/ref"
+            }
+          },
+          "required": ["ref"],
           "description": "Reference to a 1-dimensional array with coordinate values."
         },
         "explicit": {
@@ -282,7 +285,13 @@
           "maxItems": 2
         },
         "external": {
-          "$ref": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/main/schema.json#/$defs/ref",
+          "type": "object",
+          "properties": {
+            "ref": {
+              "$ref": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/main/schema.json#/$defs/ref"
+            }
+          },
+          "required": ["ref"],
           "description": "Path to an array providing boundary values."
         }
       },
@@ -299,7 +308,7 @@
         "formula": {
           "type": "string"
         },
-        "crs": {
+        "terms": {
           "type": "object",
           "description": "Keyed values objects, keyed by name of the formula term",
           "minProperties": 1,

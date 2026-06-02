@@ -32,11 +32,11 @@ In the OGC standard, a CRS describes a spatial (2D, 3D), vertical (1D) or tempor
 
 The `crs` objects may be shared between multiple Zarr arrays by defining the `crs` objects in the metadata of a Zarr group. The Zarr array will then have a reference to the `crs` objects in its `cs` object. The composition of the coordinate set is otherwise exactly the same. As an example, a Zarr group may define a `crs` object for the planar X-Y coordinates and another one for a vertical atmospheric profile. A Zarr array with surface temperature will reference just the X-Y `crs` from the Zarr group, while another Zarr array in the same store using the same X-Y `crs` object can composite both CRSs to describe vertical temperature profiles. A temporal CRS may be added to store time series for either Zarr array. The _specific_ parameters that the Zarr array derives from these CRSs then materialize the coordinate set. Note that this arrangements mimics the composition of CRSs in the OGC standard.
 
-The Zarr arrays must have their `dimension_names` attribute set. There must be an axis for each entry in the `dimension_names` attribute of the Zarr array. There may be additional axes but these must have a length of 1 and be defined as usual in a `crs` object. Note that these additional axes do not have to be present in the `shape` or `dimension_names` attributes of the Zarr array, although it is legal to do so. See the CMIP6 daily data example, below, for a demonstration of this.
+The Zarr arrays must have their `dimension_names` metadata entry set. There must be an axis for each entry in the `dimension_names` attribute of the Zarr array. There may be additional axes but these must have a length of 1 and be defined as usual in a `crs` object. Note that these additional axes do not have to be present in the `shape` or `dimension_names` attributes of the Zarr array, although it is legal to do so. See the CMIP6 daily data example, below, for a demonstration of this.
 
 ### Secondary arrays
 
-A Zarr array can make use of secondary Zarr arrays to record irregular coordinates (this convention) or other related data. Such secondary arrays are referenced with a fully-qualified path to the secondary array, relative to the referencing array. If the path to the secondary array is simple (meaning that the path does not include any forward slashes), the secondary array is located in the same group as the referencing array; otherwise the path is relative to the group of the referencing array. Parent groups can be indicated with double dots (`".."`). Use of absolute paths is discouraged.
+A Zarr array can make use of secondary Zarr arrays to record irregular coordinates (this convention) or other related data. Such secondary arrays are referenced with a fully-qualified path to the secondary array, relative to the referencing array. Parent groups can be indicated with double dots (`".."`) so a sibling array is referred to as `"../sibling"`.
 
 Implementations should make an effort to distinguish between first-class arrays - those that represent scientific variables of interest to the user - and secondary arrays that are additional to the first-class arrays. The user should preferably be presented with the first-class arrays only, with the secondary arrays made available through other constructs, such as the coordinates in this convention.
 
@@ -45,7 +45,7 @@ Implementations should make an effort to distinguish between first-class arrays 
 The objects that make up this convention are in part implemented using the [CF Metadata Conventions](https://cfconventions.org/cf-conventions/cf-conventions.html) for coordinate types and their associated objects. In practice this means that many common data holdings that apply the CF Metadata Conventions may be stored in Zarr using this convention without loss of information. The following features of the CF Metadata Conventions are supported by this convention:
 
 - [Coordinate types](https://cfconventions.org/cf-conventions/cf-conventions.html#coordinate-types) are supported, with minor differences. Latitude and longitude coordinates use other units (`"degrees_north"` and `"degrees_east"` are not true units and they are not used in this convention) and are identified by axis abbreviation and direction. Parametric vertical coordinates are fully supported but use different attributes. Time coordinates are supported for all calendars except explicitly defined calendars, using different attributes. A discrete axis is an ordinal axis in this convention.
-- [Scalar coordinate variables](https://cfconventions.org/cf-conventions/cf-conventions.html#scalar-coordinate-variables) are represented as regular axes of length 1 and may be of any supported type. These do not necessarily have to be present in the `shape` and `dimension_names` attributes of the Zarr array.
+- [Scalar coordinate variables](https://cfconventions.org/cf-conventions/cf-conventions.html#scalar-coordinate-variables) are represented as regular axes of length 1 and may be of any supported type. These do not necessarily have to be present in the `shape` and `dimension_names` metadata of the Zarr array.
 - [Bounds for one-dimensional coordinate variables](https://cfconventions.org/cf-conventions/cf-conventions.html#bounds-one-d) are an attribute of the coordinates of each axis.
 - [String-valued auxiliary coordinate variables](https://cfconventions.org/cf-conventions/cf-conventions.html#labels) are included in the definition of an axis, which may have multiple sets of coordinates. This is particularly useful for ordinal axes but it may be applied to any type of axis.
 - [Two-dimensional coordinate variables](https://cfconventions.org/cf-conventions/cf-conventions.html#_two_dimensional_latitude_longitude_coordinate_variables) are represented using the `geolocation` convention.
@@ -96,11 +96,11 @@ This convention can be used with these parts of the Zarr hierarchy:
 ## Group properties
 A Zarr group can declare any number of `crs` objects. These will be referenced by key by Zarr arrays elsewhere in the store. The `crs` property is placed at the root of the group `attributes`.
 
-| Field Name | Type   | Description        | Required |
-| ---------- | ------ | ------------------ | -------- |
-| crs        | object | Keyed `crs` object | No       |
+| Field Name | Type   | Description         | Required |
+| ---------- | ------ | ------------------- | -------- |
+| crs        | object | Keyed `crs` objects | No       |
 
-This field holds any number of [CRS objects](#crs-object) as a key-value pair. The key is not necessarily identical to the name of the `crs`. See the "Group" definition of the "CRU monthly data" example, below, for its formulation.
+This field holds any number of [CRS objects](#crs-object) as key-value pairs. The key is not necessarily identical to the name of the `crs`. See the "Group" definition of the "CRU monthly data" example, below, for its formulation.
 
 This field MUST have at least one `crs` object if it is given.
 
@@ -127,18 +127,18 @@ The unique identifier of the composite CRS, encoded using the `proj` convention.
 ### CRS object
 The `crs` object defines the coordinate system of a single CRS. A Zarr array may have multiple CRSs to fully encompass its coordinate system.
 
-| Field Name  | Type                          | Description                 | Required |
-| ----------- | ----------------------------- | --------------------------- | -------- |
-| name        | string                        | Name of the CRS             | No       |
-| axes        | [[Axis object](#axis-object)] | Array of axis properties.   | Yes      |
-| id          | `proj:` object                | Unique identifier of the CS | No       |
-| geolocation | `geolocation` object          | Geolocation arrays          | No       |
+| Field Name  | Type                 | Description                 | Required |
+| ----------- | -------------------- | --------------------------- | -------- |
+| name        | string               | Name of the CRS             | No       |
+| axes        | object               | Keyed list of [Axis object](#axis-object)s | Yes |
+| id          | `proj:` object       | Unique identifier of the CS | No       |
+| geolocation | `geolocation` object | Geolocation arrays          | No       |
 
 #### name
 The `name` field is a descriptive name of the coordinate reference system. If given, the name MUST follow standard Zarr requirements for object names.
 
 #### axes
-An array of `axis` objects. 
+A set of key-value pairs of `axis` objects. The key is the name of the axis and must match an entry in the `"dimension_names"` metadata of the array for all axes having a length of more than 1. Axes of length 1 may also be present in the `"dimension_names"` metadata but this is not mandatory.
 
 #### id
 The unique identifier of the CRS, encoded using the `proj` convention. This field SHOULD be included if the `cs` object does not include an `id` field and the identifier for this CRS is known. If the `id` field of the `cs` object is included, this identifier SHOULD be omitted.
@@ -153,13 +153,9 @@ The axis object defines all the properties of an individual axis.
 
 | Field Name   | Type     | Description                    | Required    |
 | ------------ | ---------| ------------------------------ | ----------- |
-| name         | string   | Name of the axis               | Yes         |
 | abbreviation | string   | Abbreviation of the axis name  | Conditional |
 | coordinates  | [[Coordinates object](#coordinates-object)] | Array of coordinates for the axis | Conditional |
 | attributes   | object   | Any other attributes of the axis | No |
-
-#### name
-A short name that describes this axis. The name MUST be present in the `dimension_names` attribute of the array, unless the axis is single-valued. The name MAY NOT be used by any other axis in the CRS, including across composited CRSs.
 
 #### abbreviation
 The abbreviation of the axis. It MUST be provided for axes that are in the spatio-temporal domain, using one of the values `"X"`, `"Y"`, `"Z"` or `"T"`, as appropriate. There may be only one occurrence of any of the abbreviations in the CRS, including across composited CRSs. It MUST be omitted otherwise.
@@ -238,7 +234,7 @@ The values the coordinates can be represented in different ways. One, and only o
 | Field Name | Type     | Description                                           | Required    |
 | ---------- | ---------| ----------------------------------------------------- | ----------- |
 | regular    | [number] | Initial coordinate value and increment                | Conditional |
-| external   | ref      | Reference to an external array with coordinate values | Conditional |
+| external   | `ref` object | Reference to an external array with coordinate values | Conditional |
 | explicit   | []       | JSON array of coordinate values                       | Conditional |
 
 #### regular
@@ -256,10 +252,10 @@ By default, numeric coordinate values represent a point in the coordinate space.
 
 Boundary values are only applicable to coordinates expressed in numeric values. They SHOULD NOT be specified for string-type or ordinal axes.
 
-| Field Name | Type     | Description                                                      | Required    |
-| ---------- | ---------| ---------------------------------------------------------------- | ----------- |
-| regular    | [number] | JSON array with the extent below and above the coordinate value. | Conditional |
-| external   | ref      | Reference to an array providing boundary values.                 | Conditional |
+| Field Name | Type     | Description                                                     | Required    |
+| ---------- | ---------| --------------------------------------------------------------- | ----------- |
+| regular    | [number] | JSON array with the extent below and above the coordinate value | Conditional |
+| external   | `ref` object | Reference to an array providing boundary values             | Conditional |
 
 #### regular
 When the extent around coordinate values is constant over the coordinate space of the axis, for lower and higher values separately, the boundary values are regular and expressed as a JSON array with the lower and higher extent, respectively, in units of the coordinate values.
@@ -291,7 +287,7 @@ The `terms` field is a keyed JSON object, where the key corresponds to one of th
 This field MUST have as many `values` objects as the `formula` field implies.
 
 ## Examples
-The below examples focus on the specification of the `cs` attribute for various types of files - other parts of the Zarr array specification, including general attributes, are omitted for brevity.
+The below examples focus on the specification of the `cs` attribute for various types of files - other parts of the Zarr array specification, including general attributes, are omitted for brevity. More examples can be found in the "examples" directory.
 
 ### Typical CMIP6 data set at daily resolution
 Data set: tasmin_day_GFDL-ESM4_historical_r1i1p1f1_gr1_19260605-19491231
@@ -454,10 +450,14 @@ As the previous example, less the single-valued axis, but now the temporal dimen
                     "calendar": "noleap"
                   },
                   "values": {
-                    "external": { "node": "time" }
+                    "ref": {
+                      "external": { "node": "../time" }
+                    }
                   },
                   "boundaries": {
-                    "external": { "node": "time_bnds" }
+                    "ref": {
+                      "external": { "node": "../time_bnds" }
+                    }
                   }
                 }
               ]
@@ -535,7 +535,9 @@ The axes for the coordinate set are described in this group. The "standard_calen
                   "calendar": "standard"
                 },
                 "values": {
-                  "external": { "node": "time" }
+                  "ref": {
+                    "external": { "node": "../time" }
+                  }
                 }
               }
             ]
@@ -570,12 +572,16 @@ The Zarr array holding the CRU data is located immediately below the Zarr group 
     "cs": {
       "crs": [
         {
-          "node": "..",
-          "attribute": "/attributes/crs/WGS84"
+          "ref": {
+            "node": "..",
+            "attribute": "/attributes/crs/WGS84"
+          }
         },
         {
-          "node": "..",
-          "attribute": "/attributes/crs/standard_calendar"
+          "ref": {
+            "node": "..",
+            "attribute": "/attributes/crs/standard_calendar"
+          }
         }
       ]
     }
@@ -640,10 +646,14 @@ CORDEX regionally downscaled climate projection data typically uses a so-called 
           "geolocation": {
             "geodetic": {
               "x": {
-                "node": "lon"
+                "ref": {
+                  "node": "../lon"
+                }
               },
               "y": {
-                "node": "lat"
+                "ref": {
+                  "node": "../lat"
+                }
               },
               "crs": {
                 "proj:code": "EPSG:4326"
@@ -682,70 +692,6 @@ CORDEX regionally downscaled climate projection data typically uses a so-called 
 }
 ```
 
-### HadUK-Grid Climatological data by geographic region
-Data set: sun_hadukgrid_uk_river_ann-30y_199101-202012
-
-A climatological dataset by geographic regions, summarised to a single date-time instant. The "time" axis is represented in the Zarr array, even though it has a length of 1.
-
-```
-{
-  "zarr_format": 3,
-  "node_type": "array",
-  "shape": [1, 23],
-  "dimension_names": ["time", "geo_region"],
-  "attributes": {
-    "zarr_conventions": [
-      {
-        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/main/schema.json",
-        "name": "cs"
-      }
-    ],
-    "cs": {
-      "crs": [
-        {
-          "axes": [
-            {
-              "name": "geo_region",
-              "coordinates": [
-                {
-                  "values": {
-                    "explicit": ["Anglian", "Argyll", "Clyde", "Dee", "Forth", "Humber", "Neagh Bann", "North East Scotland", "North Eastern Ireland", "North Highland", "North West England", "North Western Ireland", "Northumbria", "Orkney and Shetland", "Severn", "Solway", "South East England", "South West England", "Tay", "Thames", "Tweed", "West Highland", "Western Wales"]
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "axes": [
-            {
-              "name": "time",
-              "abbreviation": "T",
-              "direction": "future",
-              "coordinates": [
-                {
-                  "time": {
-                    "unit": "hours",
-                    "epoch": "1800-01-01",
-                    "calendar": "standard"
-                  },
-                  "values": { "explicit": [1678608] },
-                  "boundaries": { "regular": [-4344, 258624] }
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  }
-}
-```
-
 ## Known Implementations
 
 _If you implement or use this convention, please add your implementation to this list by opening an issue or submitting a pull request._
-
-## Acknowledgements
-
-This template is based on the [STAC extensions template](https://github.com/stac-extensions/template/blob/main/README.md).
