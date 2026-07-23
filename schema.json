@@ -176,10 +176,6 @@
           "type": "string",
           "description": "Abbreviation of the axis, such as \"X\" or \"Y\"."
         },
-        "direction": {
-          "type": "string",
-          "description": "The direction of increasing coordinate values. Its value must be taken from Table 48 of OGC standard \"Referencing by Coordinates\"."
-        },
         "coordinates": {
           "type": "array",
           "items": {
@@ -196,6 +192,10 @@
         "name": {
           "type": "string",
           "description": "Name of the set of coordinates."
+        },
+        "direction": {
+          "type": "string",
+          "description": "The direction of increasing coordinate values. Its value must be taken from Table 48 of OGC standard \"Referencing by Coordinates\"."
         },
         "unit": {
           "oneOf": [

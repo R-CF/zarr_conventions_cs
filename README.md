@@ -220,7 +220,7 @@ Temporal coordinates are specified using a time unit, an epoch and a calendar. I
 | calendar   | string | Name of a calendar                  | No       |
 
 #### unit
-The time unit: "second", "minute", "hour", "day", or "year", or a one-letter abbreviation thereof. The "second" unit may use a sub-multiple prefix, such as "ns" for nano-second. Following the CF Metadata Conventions, it is recommended not to use the unit "month". The unit "year", possibly with a multiple prefix such as "ky" for "kilo-year", should only be used for coordinates that span very long time scales, such as over paleological periods.
+The time unit: "second", "minute", "hour", "day", or "year", or a one-letter abbreviation thereof. The "second" unit may use a sub-multiple prefix, such as "ns" for nano-second. Following the CF Metadata Conventions, it is recommended not to use the unit "month", although it is allowed. The unit "year", possibly with a multiple prefix such as "ky" for "kilo-year", should only be used for coordinates that span very long time scales, such as over paleological periods.
 
 #### epoch
 An instant in time against which time coordinates are calculated. This should be a string value in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format, with an allowance for instants that do not exist in the Gregorian calendar (such as "2026-02-30" in a "360_day" calendar). At the epoch instant, the stored value is 0.
