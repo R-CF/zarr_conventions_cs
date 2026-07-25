@@ -5,7 +5,7 @@
 - **Schema URL**: "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/main/schema.json"
 - **Spec URL**: "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/main/README.md"
 - **Scope**: Array, Group
-- **Extension Maturity Classification**: Proposal
+- **Extension Maturity Classification**: Pilot
 - **Owner**: @pvanlaake
 
 ## Description
@@ -112,6 +112,7 @@ The `cs` property is placed at the root `attributes` level of an array. It is an
 | name       | string                      | Name of the CS        | No       |
 | crs        | [[CRS object](#crs-object)] | Array of `crs` objects | Yes     |
 | id         | `proj` object               | Unique identifier of the CS | No |
+| attributes | object                      | Attributes of the CS        | No |
 
 Irrespective of the order in which `crs` objects are defined, the composite set of axes resulting from combining the objects in the `crs` array MUST be interpreted in the order in which the axis names appear in the `dimension_names` attribute of the array to which the composited CRS is applied for addressing elements in the Zarr array. Axes of length 1 that are not reflected in the array `dimension_names` attribute may be managed in an application-specific manner.
 
@@ -123,6 +124,9 @@ An array of `crs` objects or references to a `crs` object in a group elsewhere i
 
 #### id
 The unique identifier of the composite CRS, encoded using the `proj` convention. This field SHOULD be included if the coordinate set is composited from multiple `crs` objects for the spatio-temporal domain. If this field is provided it overrides any CRS identifiers from CRSs in the `crs` array.
+
+#### attributes
+A JSON document with attributes for the coordinate system.
 
 ### CRS object
 The `crs` object defines the coordinate system of a single CRS. A Zarr array may have multiple CRSs to fully encompass its coordinate system.
@@ -256,6 +260,7 @@ Boundary values are only applicable to coordinates expressed in numeric values. 
 | ---------- | ---------| --------------------------------------------------------------- | ----------- |
 | regular    | [number] | JSON array with the extent below and above the coordinate value | Conditional |
 | external   | `ref` object | Reference to an array providing boundary values             | Conditional |
+| attributes | object   | Any other attributes of the boundaries object                   | No          |
 
 #### regular
 When the extent around coordinate values is constant over the coordinate space of the axis, for lower and higher values separately, the boundary values are regular and expressed as a JSON array with the lower and higher extent, respectively, in units of the coordinate values.
@@ -693,5 +698,18 @@ CORDEX regionally downscaled climate projection data typically uses a so-called 
 ```
 
 ## Known Implementations
+
+### Libraries and Tools
+
+- **[geozarr](https://github.com/R-CF/geozarr)** - R package for GeoZarr arrays
+  - Language: R
+  - Status: Released
+  - Maintainer: @pvanlaake
+  - Since: 2026-07-25
+- **[xarray-zarr-xgroup](https://github.com/pvanlaake/xarray-zarr-xgroup)** - XArray backend for GeoZarr support with cross-group referencing
+  - Language: Python
+  - Status: Released
+  - Maintainer: @pvanlaake
+  - Since: 2026-06-15
 
 _If you implement or use this convention, please add your implementation to this list by opening an issue or submitting a pull request._
