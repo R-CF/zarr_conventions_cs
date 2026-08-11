@@ -151,7 +151,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["compound", "planar", "vertical", "temporal", "undefined"]
+          "enum": ["compound", "planar", "vertical", "temporal", "undefined"],
           "description": "Type of the CRS"
         },
         "description": {

@@ -57,7 +57,7 @@
         },
         {
           "type": "temporal",
-          "description": "Time based on the 'noleap' calendar with 1850-01-01 epoch"
+          "description": "Time based on the 'noleap' calendar with 1850-01-01 epoch",
           "axes": {
             "time": {
               "abbreviation": "T",

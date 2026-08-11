@@ -16,7 +16,7 @@
       "name": "Sentinel-1 GRD native geometry",
       "crs": [
         {
-          "type"; "temporal",
+          "type": "temporal",
           "description": "Zero-Doppler azimuth time",
           "axes": {
             "azimuth_time": {
