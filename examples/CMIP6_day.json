@@ -17,7 +17,8 @@
     "cs": {
       "crs": [
         {
-          "name": "WGS84",
+          "type": "planar",
+          "description": "WGS84",
           "axes": {
             "lon": {
               "abbreviation": "X",
@@ -55,7 +56,8 @@
           }
         },
         {
-          "name": "Temporal scale based on the 'noleap' model calendar.",
+          "type": "temporal",
+          "description": "Time based on the 'noleap' calendar with 1850-01-01 epoch"
           "axes": {
             "time": {
               "abbreviation": "T",
@@ -79,7 +81,8 @@
           }
         },
         {
-          "name": "Height above surface for standard meteorological measurements.",
+          "type": "temporal",
+          "description": "Height above surface for standard meteorological measurements",
           "axes": {
             "height": {
               "abbreviation": "Z",

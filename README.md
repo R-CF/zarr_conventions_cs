@@ -12,7 +12,7 @@
 
 Zarr arrays have a mandatory `shape` attribute with an element for each array dimension and the element value giving the length of the dimension. This establishes an indexing space with which elements in the array can be addressed. Zarr is agnostic with regards to the semantics of dimensions and shape elements. This convention presents a schema to attach coordinate values to the dimensions of the array shape and its elements. In common language this is usually referred to as a coordinate system.
 
-This convention implements the relevant parts of the OGC standard [Referencing by Coordinates](http://www.opengis.net/doc/AS/topic-2/5.0.1), but applied to the Zarr specification and extended to dimensions beyond the spatio-temporal domain. The central concept is the **coordinate reference system** (CRS), which links a **coordinate system** to a **reference frame** (formerly named a "datum", which registers the coordinate system to some location on Earth). The **coordinate system** has axes and properties such as units-of-measure and direction. These concepts are all still "abstract": they define a model to describe the locations of points on Earth, but the coordinates of the points themselves are not there. A **coordinate set** is a materialization of a CRS: where the CRS is a conceptual model, the **coordinate set** is the _specific_ set of axes and their coordinate values that apply to a _specific_ Zarr array. More formally (section 7.1 of the OGC standard):
+This convention implements the relevant parts of the OGC standard [Referencing by Coordinates](http://www.opengis.net/doc/AS/topic-2/5.0.1), but applied to the Zarr specification and extended to dimensions beyond the spatio-temporal domain. The central concept is the **coordinate reference system** (CRS), which links a **coordinate system** to a **reference frame** (formerly named a "datum", which registers the coordinate system to some location on Earth). The **coordinate system** has axes and properties such as units-of-measure and direction. These concepts are all still "abstract": they define a model to describe the locations of points on Earth, but the coordinates of the points themselves are not there. A **coordinate set** is a materialization of a CRS for some **domain**: where the CRS is a conceptual model, the **coordinate set** is the _specific_ set of axes and their coordinate values that apply to a _specific_ Zarr array. More formally (section 7.1 of the OGC standard):
 
 > A _coordinate_ is one of _n_ scalar values that define the position of a single point.
 
@@ -28,7 +28,14 @@ This convention uses the [`proj` convention](https://github.com/zarr-conventions
 
 ### Compositing a coordinate set
 
-In the OGC standard, a CRS describes a spatial (2D, 3D), vertical (1D) or temporal (1D) domain. Each CRS has its own coordinate system. In this convention multiple CRSs are composited to create a single coordinate system that has the same rank as the Zarr array whose coordinate set is represented. The `cs` property of a Zarr array describes one or more CRSs in its `crs` array property. Each `crs` object in that array describes one or more axes and each axis has one or more sets of coordinates for the positions along the axis. Jointly, these `crs` objects must have the same rank as the Zarr array and the composition of the coordinates from the axes constitute the coordinate set of the Zarr array.
+In the OGC standard, a CRS describes a spatial (2D, 3D), vertical (1D) or temporal (1D) domain (among others). Each CRS has its own coordinate system. In this convention multiple CRSs are composited to create a single coordinate system that has the same rank as the Zarr array whose coordinate set is represented. The `cs` property of a Zarr array describes one or more CRSs in its `crs` array property. Each `crs` object in that array describes one or more axes and each axis has one or more sets of coordinates for the positions along the axis. Jointly, these `crs` objects must have the same rank as the Zarr array and the composition of the coordinates from the axes constitute the coordinate set of the Zarr array. The CRS types are simplified compared to the OGC standard to match the typical structure of gridded geo-spatial data:
+
+- **planar** for planar coordinates, comprising "GeographicCRS", "GeodeticCRS", "ProjectedCRS" and "EngineeringCRS" (2D) from the OGC standard
+- **vertical** for vertical coordinates, "VerticalCRS"
+- **temporal** for time coordinates, "TemporalCRS"
+- **undefined** for coordinate system axes that are not in the X-Y-Z-T domain.
+
+A special case is "compound", nominally "CompoundCRS". This type should be used when the full contents of the CRS is unknown to the application, and then it is associated with the `cs` object rather than `crs` - consequently, the CRS _may_ be compound but it may also be of another type. This is typically the case for spatial data having a single description of its CRS, either by WKT2 string or identifier code.
 
 The `crs` objects may be shared between multiple Zarr arrays by defining the `crs` objects in the metadata of a Zarr group. The Zarr array will then have a reference to the `crs` objects in its `cs` object. The composition of the coordinate set is otherwise exactly the same. As an example, a Zarr group may define a `crs` object for the planar X-Y coordinates and another one for a vertical atmospheric profile. A Zarr array with surface temperature will reference just the X-Y `crs` from the Zarr group, while another Zarr array in the same store using the same X-Y `crs` object can composite both CRSs to describe vertical temperature profiles. A temporal CRS may be added to store time series for either Zarr array. The _specific_ parameters that the Zarr array derives from these CRSs then materialize the coordinate set. Note that this arrangements mimics the composition of CRSs in the OGC standard.
 
@@ -114,7 +121,7 @@ The `cs` property is placed at the root `attributes` level of an array. It is an
 | id         | `proj` object               | Unique identifier of the CS | No |
 | attributes | object                      | Attributes of the CS        | No |
 
-Irrespective of the order in which `crs` objects are defined, the composite set of axes resulting from combining the objects in the `crs` array MUST be interpreted in the order in which the axis names appear in the `dimension_names` attribute of the array to which the composited CRS is applied for addressing elements in the Zarr array. Axes of length 1 that are not reflected in the array `dimension_names` attribute may be managed in an application-specific manner.
+Irrespective of the order in which `crs` objects are defined, the composite set of axes resulting from combining the objects in the `crs` array MUST be interpreted in the order in which the axis names appear in the `dimension_names` attribute of the array to which the composited CRS is applied for addressing elements in the Zarr array. Axes of length 1 that are not included in the array `dimension_names` metadata may be managed in an application-specific manner.
 
 #### name
 The `name` field is a descriptive name of the coordinate set. The name MUST follow standard Zarr requirements for object names.
@@ -123,7 +130,7 @@ The `name` field is a descriptive name of the coordinate set. The name MUST foll
 An array of `crs` objects or references to a `crs` object in a group elsewhere in the Zarr store. 
 
 #### id
-The unique identifier of the composite CRS, encoded using the `proj` convention. This field SHOULD be included if the coordinate set is composited from multiple `crs` objects for the spatio-temporal domain. If this field is provided it overrides any CRS identifiers from CRSs in the `crs` array.
+The unique identifier of the compound CRS, encoded using the `proj` convention. This field SHOULD be included if the coordinate set is composited from multiple `crs` objects for the spatio-temporal domain. If this field is provided it overrides any CRS identifiers from CRSs in the `crs` array.
 
 #### attributes
 A JSON document with attributes for the coordinate system.
@@ -133,13 +140,14 @@ The `crs` object defines the coordinate system of a single CRS. A Zarr array may
 
 | Field Name  | Type                 | Description                 | Required |
 | ----------- | -------------------- | --------------------------- | -------- |
-| name        | string               | Name of the CRS             | No       |
+| type        | string               | Type of the CRS             | Yes      |
+| description | string               | Description of the nature of the CRS | No |
 | axes        | object               | Keyed list of [Axis object](#axis-object)s | Yes |
-| id          | `proj:` object       | Unique identifier of the CS | No       |
+| id          | `proj` object        | Unique identifier of the CS | No       |
 | geolocation | `geolocation` object | Geolocation arrays          | No       |
 
-#### name
-The `name` field is a descriptive name of the coordinate reference system. If given, the name MUST follow standard Zarr requirements for object names.
+#### type
+The `type` field indicates the type of the CRS, one of "compound", "planar", "vertical", "temporal" or "undefined".
 
 #### axes
 A set of key-value pairs of `axis` objects. The key is the name of the axis and must match an entry in the `"dimension_names"` metadata of the array for all axes having a length of more than 1. Axes of length 1 may also be present in the `"dimension_names"` metadata but this is not mandatory.

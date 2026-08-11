@@ -21,7 +21,8 @@
     "cs": {
       "crs": [
         {
-          "name": "rotated pole grid for CORDEX EUR-11 domain",
+          "type": "planar",
+          "description": "Rotated pole grid for CORDEX EUR-11 domain",
           "axes": {
             "rlon": {
               "abbreviation": "X",
@@ -63,7 +64,8 @@
           }
         },
         {
-          "name": "Temporal scale based on the '360_day' model calendar.",
+          "type": "temporal",
+          "description": "Temporal scale based on the '360_day' model calendar.",
           "axes": {
             "time": {
               "abbreviation": "T",

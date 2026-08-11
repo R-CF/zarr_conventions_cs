@@ -13,6 +13,7 @@
     "cs": {
       "crs": [
         {
+          "type": "undefined",
           "axes": {
             "geo_region": {
               "coordinates": [
@@ -26,6 +27,7 @@
           }
         },
         {
+          "type": "temporal",
           "axes": {
             "time": {
               "abbreviation": "T",

@@ -18,6 +18,7 @@
     ],
     "crs": {
       "WGS84": {
+        "type": "planar",
         "axes": {
           "lon": {
             "abbreviation": "X",
@@ -49,6 +50,7 @@
         }
       },
       "standard_calendar": {
+        "type": "temporal",
         "axes": {
           "time": {
             "abbreviation": "T",

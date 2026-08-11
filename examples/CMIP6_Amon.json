@@ -17,7 +17,8 @@
     "cs": {
       "crs": [
         {
-          "name": "WGS84",
+          "type": "planar",
+          "description"; "WGS84"
           "axes": {
             "lon": {
               "abbreviation": "X",
@@ -52,7 +53,8 @@
           }
         },
         {
-          "name": "Temporal scale based on the 'noleap' model calendar.",
+          "type": "temporal",
+          "description": "Temporal scale based on the 'noleap' model calendar.",
           "axes": {
             "time": {
               "abbreviation": "T",

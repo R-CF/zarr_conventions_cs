@@ -149,9 +149,14 @@
       "type": "object",
       "description": "CRS definition.",
       "properties": {
-        "name": {
+        "type": {
           "type": "string",
-          "description": "Descriptive name for the coordinate reference system."
+          "enum": ["compound", "planar", "vertical", "temporal", "undefined"]
+          "description": "Type of the CRS"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the nature of the CRS"
         },
         "axes": {
           "type": "object",

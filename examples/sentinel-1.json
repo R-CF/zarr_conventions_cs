@@ -16,7 +16,8 @@
       "name": "Sentinel-1 GRD native geometry",
       "crs": [
         {
-          "name": "Zero-Doppler azimuth time",
+          "type"; "temporal",
+          "description": "Zero-Doppler azimuth time",
           "axes": {
             "azimuth_time": {
               "abbreviation": "T",
@@ -34,7 +35,8 @@
           }
         },
         {
-          "name": "Ground range distance from sub-satellite track",
+          "type": "undefined",
+          "description": "Ground range distance from sub-satellite track",
           "axes": {
             "ground_range": {
               "direction": "away",
