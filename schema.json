@@ -147,8 +147,12 @@
     },
     "crs": {
       "type": "object",
-      "description": "CRS definition.",
+      "description": "CRS definition",
       "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the CRS"
+        },
         "type": {
           "type": "string",
           "enum": ["compound", "planar", "vertical", "temporal", "undefined"],
@@ -173,7 +177,7 @@
           "$ref": "https://raw.githubusercontent.com/R-CF/zarr_convention_geolocation/main/schema.json#/$defs/geolocation"
         }
       },
-      "required": ["axes"],
+      "required": ["type", "axes"],
       "additionalProperties": true
     },
     "axis": {

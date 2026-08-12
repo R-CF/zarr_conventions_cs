@@ -140,6 +140,7 @@ The `crs` object defines the coordinate system of a single CRS. A Zarr array may
 
 | Field Name  | Type                 | Description                 | Required |
 | ----------- | -------------------- | --------------------------- | -------- |
+| name        | string               | Name of the CRS             | No       |
 | type        | string               | Type of the CRS             | Yes      |
 | description | string               | Description of the nature of the CRS | No |
 | axes        | object               | Keyed list of [Axis object](#axis-object)s | Yes |
