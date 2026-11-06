@@ -2,8 +2,8 @@
 
 - **UUID**: e4dbf0b7-7a00-4ce6-b23e-484292014ab4
 - **Name**: "cs"
-- **Schema URL**: "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/main/schema.json"
-- **Spec URL**: "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/main/README.md"
+- **Schema URL**: "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/refs/heads/main/schema.json"
+- **Spec URL**: "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/refs/heads/main/README.md"
 - **Scope**: Array, Group
 - **Extension Maturity Classification**: Pilot
 - **Owner**: @pvanlaake
@@ -84,8 +84,8 @@ The convention must be registered in the `zarr_conventions` attribute of the gro
 {
   "zarr_conventions": [
     {
-      "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/main/schema.json",
-      "spec_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/main/README.md",
+      "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/refs/heads/main/schema.json",
+      "spec_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/refs/heads/main/README.md",
       "uuid": "e4dbf0b7-7a00-4ce6-b23e-484292014ab4",
       "name": "cs",
       "description": "Coordinate set for n-dimensional arrays"

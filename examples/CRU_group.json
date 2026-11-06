@@ -4,15 +4,15 @@
   "attributes": {
     "zarr_conventions": [
       {
-        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/main/schema.json",
+        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_conventions_cs/refs/heads/main/schema.json",
         "name": "cs"
       },
       {
-        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/main/schema.json",
+        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/refs/tags/v2.0.0/schema.json",
         "name": "ref"
       },
       {
-        "schema_url": "https://raw.githubusercontent.com/zarr-conventions/geo-proj/main/schema.json",
+        "schema_url": "https://raw.githubusercontent.com/zarr-conventions/proj/refs/tags/v0.1/schema.json",
         "name": "proj"
       }
     ],

@@ -6,10 +6,12 @@
   "attributes": {
     "zarr_conventions": [
       { "name": "cs",
-        "uuid": "e4dbf0b7-7a00-4ce6-b23e-484292014ab4"
+        "uuid": "e4dbf0b7-7a00-4ce6-b23e-484292014ab4",
+        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_conventions_cs/refs/heads/main/schema.json"
       },
       { "name": "geolocation",
-        "uuid": "bb9ee930-8c60-4c47-ad6b-8daa558987ed"
+        "uuid": "bb9ee930-8c60-4c47-ad6b-8daa558987ed",
+        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_geolocation/refs/tags/v1.1.0/schema.json"
       }
     ],
     "cs": {
@@ -49,9 +51,17 @@
           },
           "geolocation": {
             "geodetic": {
-              "x": { "node": "../lon" },
-              "y": { "node": "../lat" },
-              "crs": {
+              "x": {
+                "ref": {
+                  "node": "../lon"
+                }
+              },
+              "y": {
+                "ref": {
+                  "node": "../lat"
+                }
+              },
+              "id": {
                 "proj:code": "EPSG:4326"
               }
             }
