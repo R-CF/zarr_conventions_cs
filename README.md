@@ -77,6 +77,10 @@ This convention is not a Zarr implementation of the full CF Metadata Conventions
 ## Inheritance Model
 The `cs` convention applies to an array. The contained `crs` objects may also be defined in a group so that they may be referenced by multiple arrays located elsewhere in the Zarr store. When using this form of inheritance, the array has a reference to the group where the `crs` object is defined and a JSON pointer to the location in the attributes of the group with the definition of the `crs` object. 
 
+References inside a `crs` object, such as those to arrays with coordinate values, boundary values, parametric formula terms or geolocation arrays, are resolved relative to the node in whose metadata the `crs` object is defined. For a `crs` object defined in a group, relative paths are thus relative to that group, not to the array that references the `crs` object. This way the `crs` object has the same meaning for every array that uses it, wherever that array is located in the Zarr store.
+
+Conventions that are used in a `crs` object defined in a group, such as `ref`, `proj` and `geolocation`, MUST be registered in the `zarr_conventions` attribute of that group.
+
 ## Convention Registration
 The convention must be registered in the `zarr_conventions` attribute of the group or array:
 
@@ -317,7 +321,7 @@ A typical CMIP6 data set contains a single data variable. The coordinate set can
   "attributes": {
     "zarr_conventions": [
       {
-        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/main/schema.json",
+        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_conventions_cs/refs/heads/main/schema.json",
         "name": "cs"
       }
     ],
@@ -410,11 +414,11 @@ As the previous example, less the single-valued axis, but now the temporal dimen
   "attributes": {
     "zarr_conventions": [
       {
-        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/main/schema.json",
+        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_conventions_cs/refs/heads/main/schema.json",
         "name": "cs"
       },
       {
-        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/main/schema.json",
+        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/refs/tags/v2.0.0/schema.json",
         "name": "ref"
       }
     ],
@@ -464,13 +468,13 @@ As the previous example, less the single-valued axis, but now the temporal dimen
                     "calendar": "noleap"
                   },
                   "values": {
-                    "ref": {
-                      "external": { "node": "../time" }
+                    "external": {
+                      "ref": { "node": "../time" }
                     }
                   },
                   "boundaries": {
-                    "ref": {
-                      "external": { "node": "../time_bnds" }
+                    "external": {
+                      "ref": { "node": "../time_bnds" }
                     }
                   }
                 }
@@ -490,7 +494,7 @@ Data set: cru_ts4.07.1901.2022.tmp.dat
 The CRU data files usually have a single data variable but an additional variable to indicate the number of stations contributing data to the local interpolated value. The additional variable has the same coordinate set as the principal variable and the `cs` object is thus shared between the two variables.
 
 #### Group: Defining the coordinate set
-The axes for the coordinate set are described in this group. The "standard_calendar" temporal axis is external, but located as Zarr array "time" in this group.
+The axes for the coordinate set are described in this group. The "standard_calendar" temporal axis is external, but located as Zarr array "time" in this group. Since references in a `crs` object defined in a group are relative to that group, the array is referenced as `"time"`.
 
 ```
 {
@@ -499,11 +503,11 @@ The axes for the coordinate set are described in this group. The "standard_calen
   "attributes": {
     "zarr_conventions": [
       {
-        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/main/schema.json",
+        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_conventions_cs/refs/heads/main/schema.json",
         "name": "cs"
       },
       {
-        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/main/schema.json",
+        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/refs/tags/v2.0.0/schema.json",
         "name": "ref"
       }
     ],
@@ -549,8 +553,8 @@ The axes for the coordinate set are described in this group. The "standard_calen
                   "calendar": "standard"
                 },
                 "values": {
-                  "ref": {
-                    "external": { "node": "../time" }
+                  "external": {
+                    "ref": { "node": "time" }
                   }
                 }
               }
@@ -575,11 +579,11 @@ The Zarr array holding the CRU data is located immediately below the Zarr group 
   "attributes": {
     "zarr_conventions": [
       {
-        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/main/schema.json",
+        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_conventions_cs/refs/heads/main/schema.json",
         "name": "cs"
       },
       {
-        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/main/schema.json",
+        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_ref/refs/tags/v2.0.0/schema.json",
         "name": "ref"
       }
     ],
@@ -617,12 +621,16 @@ CORDEX regionally downscaled climate projection data typically uses a so-called 
   "attributes": {
     "zarr_conventions": [
       {
-        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_cs/main/schema.json",
+        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_conventions_cs/refs/heads/main/schema.json",
         "name": "cs"
       },
       {
-        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_geolocation/main/schema.json",
+        "schema_url": "https://raw.githubusercontent.com/R-CF/zarr_convention_geolocation/refs/tags/v1.1.0/schema.json",
         "name": "geolocation"
+      },
+      {
+        "schema_url": "https://raw.githubusercontent.com/zarr-conventions/proj/refs/tags/v0.1/schema.json",
+        "name": "proj"
       }
     ],
     "cs": {
@@ -669,7 +677,7 @@ CORDEX regionally downscaled climate projection data typically uses a so-called 
                   "node": "../lat"
                 }
               },
-              "crs": {
+              "id": {
                 "proj:code": "EPSG:4326"
               }
             }

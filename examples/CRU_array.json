@@ -17,12 +17,16 @@
     "cs": {
       "crs": [
         {
-          "node": "..",
-          "attribute": "/attributes/crs/WGS84"
+          "ref": {
+            "node": "..",
+            "attribute": "/attributes/crs/WGS84"
+          }
         },
         {
-          "node": "..",
-          "attribute": "/attributes/crs/standard_calendar"
+          "ref": {
+            "node": "..",
+            "attribute": "/attributes/crs/standard_calendar"
+          }
         }
       ]
     }

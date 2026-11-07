@@ -65,7 +65,7 @@
                 "values": {
                   "external": {
                     "ref": {
-                      "node": "../time"
+                      "node": "time"
                     }
                   }
                 }
